@@ -2,11 +2,10 @@
 
 import { motion } from 'motion/react';
 import { useId } from 'react';
+import { AssigneeMenu } from '@/components/assignee-menu';
 import { useFlash } from '@/components/flash-provider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { WhoBadge } from '@/components/who-badge';
 import { useDeleteTask, useSetDeadline } from '@/hooks/use-plan';
 import { useTaskActions } from '@/hooks/use-task-actions';
 import { isOverdue, tint } from '@/lib/format';
@@ -18,8 +17,11 @@ import type { Task } from '@/lib/types';
 const DRAG_BG = '#F2E7CF';
 const ROW_PADDING_Y = 8;
 
+/** The assignee pill and the deadline field share this, so they line up. */
+const CONTROL_HEIGHT = 'h-6';
+
 export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
-  const { onToggle, onCycleWho } = useTaskActions(task.id);
+  const { onToggle, onToggleAssignee } = useTaskActions(task.id);
   const setDeadline = useSetDeadline();
   const deleteTask = useDeleteTask();
   const { flashes, flash } = useFlash();
@@ -33,7 +35,6 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
 
   return (
     <motion.div
-      // `position` only: the row's own height is animated below, on enter and exit.
       layout="position"
       {...listItemMotion(ROW_PADDING_Y)}
       draggable
@@ -53,8 +54,8 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
         id={checkboxId}
         checked={task.done}
         onCheckedChange={onToggle}
-        className="size-[26px] min-w-[26px]"
-        iconClassName="text-[15px]"
+        className="size-4 min-w-4 rounded-[5px]"
+        iconClassName="text-[10px]"
       />
 
       <Label
@@ -76,19 +77,7 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
         </span>
       </Label>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            onClick={onCycleWho}
-            className="cursor-pointer rounded-full border-[1.5px] border-input bg-background px-2.5
-              py-1 text-[12.5px] font-extrabold whitespace-nowrap text-secondary-foreground"
-          >
-            <WhoBadge who={task.who} glyphClassName="size-[15px] text-[13px]" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent>Klik om toe te wijzen</TooltipContent>
-      </Tooltip>
+      <AssigneeMenu who={task.who} onToggle={onToggleAssignee} className={CONTROL_HEIGHT} />
 
       <input
         type="date"
@@ -99,8 +88,9 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
           flash(task.id);
         }}
         className={cn(
-          `w-[118px] rounded-lg border-[1.5px] border-input bg-background px-1.5 py-[3px] text-xs
-          font-bold outline-none`,
+          `w-[118px] rounded-lg border-[1.5px] border-input bg-background px-1.5 text-xs font-bold
+          outline-none`,
+          CONTROL_HEIGHT,
           overdue ? 'text-destructive' : 'text-[#8A785C]',
         )}
       />
@@ -109,8 +99,8 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
         type="button"
         aria-label="Taak verwijderen"
         onClick={() => deleteTask(task.id)}
-        className="cursor-pointer px-1 py-0.5 text-[17px] text-[#C9B48C] transition-colors
-          hover:text-destructive"
+        className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-[13px]
+          leading-none text-[#C9B48C] transition-colors hover:text-destructive"
       >
         ✕
       </button>

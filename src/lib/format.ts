@@ -1,5 +1,3 @@
-import { PIGICORN } from '@/lib/plan-config';
-
 /** Midnight today, so deadline comparisons ignore the time of day. */
 export function startOfToday(now: Date = new Date()): Date {
   const today = new Date(now);
@@ -96,33 +94,6 @@ export function sanitizeAmount(value: string): string {
 
 export function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max)}…` : text;
-}
-
-export type WhoLabel = {
-  /** Avatar tokens to render before the name, via `<AvatarGlyph>`. */
-  avatars: string[];
-  name: string;
-};
-
-/**
- * `Wally` → 🦆 + `Wally`. Returns the avatars separately rather than a single
- * string, because Joyce's is an SVG rather than a character.
- */
-export function whoLabel(who: string): WhoLabel {
-  switch (who) {
-    case 'Wally':
-      return { avatars: ['🦆'], name: 'Wally' };
-    case 'WJ':
-      return { avatars: ['🐵'], name: 'WJ' };
-    case 'Joyce':
-      return { avatars: [PIGICORN], name: 'Joyce' };
-    case 'Samen':
-      return { avatars: ['🦆', '🐵'], name: 'Samen' };
-    case 'n.t.b.':
-      return { avatars: ['·'], name: 'n.t.b.' };
-    default:
-      return { avatars: [], name: who };
-  }
 }
 
 /** A six-digit hex colour at ~18% opacity, for the edit-flash background. */

@@ -2,31 +2,33 @@ import { LiveList, LiveObject } from '@liveblocks/client';
 import { SEEDED_USERS } from '@/lib/plan-config';
 import type { ActivityEntry, Cost, KnownUser, PhaseId, Question, Task } from '@/lib/types';
 
-type SeedTask = [phase: PhaseId, title: string, who: string];
+type SeedTask = [phase: PhaseId, title: string, who: string[]];
+
+const BOTH = ['Wally', 'WJ'];
 
 const SEED_TASKS: readonly SeedTask[] = [
-  [1, 'Zwager contacteren over mankracht (spuiten, badkamer, sloop)', 'Wally'],
-  [1, 'Kostenindicatie opvragen bij zwager/gasten', 'Wally'],
-  [1, 'Vragen of zwager weekendmensen kan leveren', 'Wally'],
-  [2, 'Alles inpakken in dozen (begin nu)', 'Wally'],
-  [2, 'Spullen wegdoen/weggeven die niet mee hoeven', 'Wally'],
-  [2, 'Vanaf 15 juli: dozen naar de nieuwe opslag brengen', 'Wally'],
-  [2, 'Samen zoveel mogelijk verhuizen met de kar/aanhanger', 'Samen'],
-  [2, 'Huis zo leeg mogelijk maken vóór het spuiten', 'Wally'],
-  [3, 'Weekend/moment prikken voor afplakken + spuiten', 'Samen'],
-  [3, 'Keuken verwijderen vóór het spuiten', 'n.t.b.'],
-  [3, 'Douchecabine verwijderen', 'n.t.b.'],
-  [3, 'Afplakken en spuiten (schilderwerk)', 'n.t.b.'],
-  [3, 'Tijdelijke kookplek inrichten', 'WJ'],
-  [3, 'Sloopwerk: afvoer regelen (waar gaat het puin heen?)', 'n.t.b.'],
-  [3, 'Op basis van prijs beslissen: zelf doen vs. uitbesteden', 'Samen'],
-  [4, 'Samen keuken uitzoeken', 'Samen'],
-  [4, 'Samen douchecabine uitzoeken (WJ zoekt cabine incl. wanden)', 'Samen'],
-  [4, 'Kurk-ontwerpje maken voor prijsindicatie', 'WJ'],
-  [4, 'Onderverdieping tot washok maken (aan aannemer vragen)', 'n.t.b.'],
-  [4, 'Onderzoek: stille airco/warmtepomp (evt. balkon)', 'WJ'],
-  [5, 'Kostenindicaties verzamelen (mankracht, keuken, badkamer, airco)', 'Samen'],
-  [5, 'Samen bepalen hoe we de kosten verdelen/betalen', 'Samen'],
+  [1, 'Zwager contacteren over mankracht (spuiten, badkamer, sloop)', ['Wally']],
+  [1, 'Kostenindicatie opvragen bij zwager/gasten', ['Wally']],
+  [1, 'Vragen of zwager weekendmensen kan leveren', ['Wally']],
+  [2, 'Alles inpakken in dozen (begin nu)', ['Wally']],
+  [2, 'Spullen wegdoen/weggeven die niet mee hoeven', ['Wally']],
+  [2, 'Vanaf 15 juli: dozen naar de nieuwe opslag brengen', ['Wally']],
+  [2, 'Samen zoveel mogelijk verhuizen met de kar/aanhanger', BOTH],
+  [2, 'Huis zo leeg mogelijk maken vóór het spuiten', ['Wally']],
+  [3, 'Weekend/moment prikken voor afplakken + spuiten', BOTH],
+  [3, 'Keuken verwijderen vóór het spuiten', []],
+  [3, 'Douchecabine verwijderen', []],
+  [3, 'Afplakken en spuiten (schilderwerk)', []],
+  [3, 'Tijdelijke kookplek inrichten', ['WJ']],
+  [3, 'Sloopwerk: afvoer regelen (waar gaat het puin heen?)', []],
+  [3, 'Op basis van prijs beslissen: zelf doen vs. uitbesteden', BOTH],
+  [4, 'Samen keuken uitzoeken', BOTH],
+  [4, 'Samen douchecabine uitzoeken (WJ zoekt cabine incl. wanden)', BOTH],
+  [4, 'Kurk-ontwerpje maken voor prijsindicatie', ['WJ']],
+  [4, 'Onderverdieping tot washok maken (aan aannemer vragen)', []],
+  [4, 'Onderzoek: stille airco/warmtepomp (evt. balkon)', ['WJ']],
+  [5, 'Kostenindicaties verzamelen (mankracht, keuken, badkamer, airco)', BOTH],
+  [5, 'Samen bepalen hoe we de kosten verdelen/betalen', BOTH],
 ] as const;
 
 const SEED_QUESTIONS: readonly string[] = [
@@ -55,7 +57,8 @@ export function initialStorage() {
         id: `t${index + 1}`,
         phase,
         title,
-        who,
+        // A fresh array per task: BOTH is shared, and storage must not alias it.
+        who: [...who],
         deadline: '',
         done: false,
         doneBy: '',

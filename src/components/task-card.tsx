@@ -2,10 +2,10 @@
 
 import { motion } from 'motion/react';
 import { useId } from 'react';
+import { AssigneeMenu } from '@/components/assignee-menu';
 import { useFlash } from '@/components/flash-provider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { WhoBadge } from '@/components/who-badge';
 import { useTaskActions } from '@/hooks/use-task-actions';
 import { formatDeadlineShort, isOverdue, tint } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
@@ -17,7 +17,7 @@ const CARD_PADDING_Y = 10;
 
 /** The board view's compact card. Same data, fewer controls than the list row. */
 export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
-  const { onToggle, onCycleWho } = useTaskActions(task.id);
+  const { onToggle, onToggleAssignee } = useTaskActions(task.id);
   const { flashes } = useFlash();
   const checkboxId = useId();
 
@@ -45,8 +45,8 @@ export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
             id={checkboxId}
             checked={task.done}
             onCheckedChange={onToggle}
-            className="size-[22px] min-w-[22px] rounded-[7px]"
-            iconClassName="text-xs"
+            className="mt-px size-4 min-w-4 rounded-[5px]"
+            iconClassName="text-[10px]"
           />
           <Label
             htmlFor={checkboxId}
@@ -60,14 +60,12 @@ export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
         </div>
 
         <div className="mt-2 flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={onCycleWho}
-            className="cursor-pointer rounded-full border-[1.5px] border-input bg-background px-2
-              py-0.5 text-[11.5px] font-extrabold text-secondary-foreground"
-          >
-            <WhoBadge who={task.who} glyphClassName="size-[13px] text-[11px]" />
-          </button>
+          <AssigneeMenu
+            who={task.who}
+            onToggle={onToggleAssignee}
+            className="h-[22px]"
+            glyphClassName="size-[13px] text-[11px]"
+          />
           <span
             className={cn(
               'text-[11.5px] font-extrabold',

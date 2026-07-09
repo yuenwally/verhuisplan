@@ -26,10 +26,25 @@ function CostRow({ cost }: { cost: Cost }) {
       className="group flex items-center gap-2 overflow-hidden rounded-md transition-colors
         duration-300"
     >
-      <Label htmlFor={amountId} className="flex-1 cursor-pointer text-[13.5px] font-bold">
+      {/* The delete button sits before the label rather than after the field, so
+          the field can run to the card's edge and line up with the add-input. */}
+      <button
+        type="button"
+        aria-label={`${cost.label} verwijderen`}
+        onClick={() => deleteCost(cost.id)}
+        className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-[13px]
+          leading-none text-[#C9B48C] opacity-0 transition group-hover:opacity-100
+          hover:text-destructive focus-visible:opacity-100"
+      >
+        ✕
+      </button>
+      <Label
+        htmlFor={amountId}
+        className="min-w-0 flex-[2] cursor-pointer truncate text-[13.5px] font-bold"
+      >
         {cost.label}
       </Label>
-      <div className="flex items-center gap-1">
+      <div className="flex min-w-[104px] flex-1 items-center gap-1">
         <span className="text-[13px] font-extrabold text-[#8A785C]">€</span>
         <input
           id={amountId}
@@ -40,19 +55,10 @@ function CostRow({ cost }: { cost: Cost }) {
             setAmount(cost.id, sanitizeAmount(event.target.value));
             flash(cost.id);
           }}
-          className="w-21 rounded-lg border-[1.5px] border-input bg-background px-2 py-1.5
-            text-right text-[13px] font-bold text-foreground outline-none"
+          className="min-w-0 flex-1 rounded-[4px] border-[1.5px] border-input bg-background px-2
+            py-1.5 text-right text-[13px] font-bold text-foreground outline-none"
         />
       </div>
-      <button
-        type="button"
-        aria-label={`${cost.label} verwijderen`}
-        onClick={() => deleteCost(cost.id)}
-        className="cursor-pointer px-0.5 text-sm text-[#C9B48C] opacity-0 transition
-          group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
-      >
-        ✕
-      </button>
     </motion.div>
   );
 }
@@ -89,7 +95,7 @@ export function CostsCard() {
       <AddInput
         className="mt-3"
         placeholder="+ kostenpost…"
-        inputClassName="rounded-[9px] px-2.75 py-2 text-[13px]"
+        inputClassName="rounded-[4px] px-2.75 py-2 text-[13px]"
         onSubmit={addCost}
       />
     </section>

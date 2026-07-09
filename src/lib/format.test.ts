@@ -7,9 +7,7 @@ import {
   sanitizeAmount,
   timeAgo,
   truncate,
-  whoLabel,
 } from '@/lib/format';
-import { PIGICORN } from '@/lib/plan-config';
 
 const TODAY = new Date('2026-07-09T00:00:00');
 
@@ -113,23 +111,6 @@ describe('sanitizeAmount', () => {
 
   it('strips everything else', () => {
     expect(sanitizeAmount('€ 12a3 ')).toBe('123');
-  });
-});
-
-describe('whoLabel', () => {
-  it('decorates the known assignees', () => {
-    expect(whoLabel('Wally')).toEqual({ avatars: ['🦆'], name: 'Wally' });
-    expect(whoLabel('WJ')).toEqual({ avatars: ['🐵'], name: 'WJ' });
-    expect(whoLabel('Samen')).toEqual({ avatars: ['🦆', '🐵'], name: 'Samen' });
-    expect(whoLabel('n.t.b.')).toEqual({ avatars: ['·'], name: 'n.t.b.' });
-  });
-
-  it('gives Joyce the drawn pigicorn rather than a character', () => {
-    expect(whoLabel('Joyce')).toEqual({ avatars: [PIGICORN], name: 'Joyce' });
-  });
-
-  it('leaves a guest name bare', () => {
-    expect(whoLabel('Sanne')).toEqual({ avatars: [], name: 'Sanne' });
   });
 });
 

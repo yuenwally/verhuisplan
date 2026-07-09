@@ -44,4 +44,10 @@ describe('listItemMotion', () => {
     expect(item.exit).toMatchObject({ height: 0, paddingTop: 0, paddingBottom: 0 });
     expect(timing(item.exit, 'paddingTop').delay).toBe(timing(item.exit, 'height').delay);
   });
+
+  it('moves displaced siblings on the same curve as the row itself', () => {
+    const layout = item.transition.layout as unknown as Timing;
+
+    expect(layout.duration).toBe(timing(item.animate, 'height').duration);
+  });
 });

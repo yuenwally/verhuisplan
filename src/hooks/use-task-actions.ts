@@ -2,15 +2,15 @@
 
 import { useConfetti } from '@/components/confetti-provider';
 import { useFlash } from '@/components/flash-provider';
-import { useCycleWho, useToggleTask } from '@/hooks/use-plan';
+import { useToggleAssignee, useToggleTask } from '@/hooks/use-plan';
 
 /**
- * The two actions a task offers in both views, with the multiplayer side effects
+ * The actions a task offers in both views, with the multiplayer side effects
  * attached: everyone else sees the row flash, and finishing a phase throws confetti.
  */
 export function useTaskActions(taskId: string) {
   const toggle = useToggleTask();
-  const cycle = useCycleWho();
+  const assign = useToggleAssignee();
   const { flash } = useFlash();
   const { celebrate } = useConfetti();
 
@@ -23,8 +23,8 @@ export function useTaskActions(taskId: string) {
         celebrate();
       }
     },
-    onCycleWho: () => {
-      cycle(taskId);
+    onToggleAssignee: (name: string) => {
+      assign(taskId, name);
       flash(taskId);
     },
   };

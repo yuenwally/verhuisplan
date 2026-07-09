@@ -34,8 +34,8 @@ function QuestionRow({ question }: { question: Question }) {
           toggleQuestion(question.id);
           flash(question.id);
         }}
-        className="mt-px size-5 min-w-5 rounded-md"
-        iconClassName="text-[11px]"
+        className="mt-0.5 size-4 min-w-4 rounded-[5px]"
+        iconClassName="text-[10px]"
       />
       <Label
         htmlFor={checkboxId}
@@ -50,8 +50,8 @@ function QuestionRow({ question }: { question: Question }) {
         type="button"
         aria-label="Vraag verwijderen"
         onClick={() => deleteQuestion(question.id)}
-        className="cursor-pointer px-0.5 text-sm text-[#C9B48C] transition-colors
-          hover:text-destructive"
+        className="mt-0.5 flex size-4 shrink-0 cursor-pointer items-center justify-center
+          text-[13px] leading-none text-[#C9B48C] transition-colors hover:text-destructive"
       >
         ✕
       </button>

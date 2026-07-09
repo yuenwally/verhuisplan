@@ -2,9 +2,9 @@
 
 import { LiveObject, nanoid } from '@liveblocks/client';
 import { useMutation, useStorage } from '@liveblocks/react/suspense';
+import { normalizeWho, toggleAssignee } from '@/lib/assignees';
 import { truncate } from '@/lib/format';
-import { cycleWho } from '@/lib/identity';
-import { ACTIVITY_LIMIT, WHO_OPTIONS } from '@/lib/plan-config';
+import { ACTIVITY_LIMIT, SEEDED_USERS } from '@/lib/plan-config';
 import { moveWithinPhase } from '@/lib/reorder';
 import type { ActivityEntry, Cost, PhaseId, Question, Task } from '@/lib/types';
 import type { LiveList, LiveObject as LiveObjectType, User } from '@liveblocks/client';
@@ -86,7 +86,7 @@ export function useAddTask() {
         id: nanoid(),
         phase,
         title: trimmed,
-        who: 'n.t.b.',
+        who: [],
         deadline: '',
         done: false,
         doneBy: '',
@@ -132,20 +132,26 @@ export function useToggleTask() {
   }, []);
 }
 
-export function useCycleWho() {
-  return useMutation(({ storage }, id: string) => {
+/** Everyone who could be assigned: the seeded three, then whoever else joined. */
+export function useAssignableNames(): string[] {
+  const users = useKnownUsers();
+  const seeded = SEEDED_USERS.map((user) => user.name);
+  const extra = users
+    .map((user) => user.name)
+    .filter((name) => !seeded.includes(name));
+
+  return [...seeded, ...extra];
+}
+
+export function useToggleAssignee() {
+  return useMutation(({ storage }, id: string, name: string) => {
     const task = findById(storage.get('tasks'), id);
 
     if (!task) {
       return;
     }
 
-    const extra = storage
-      .get('users')
-      .map((user) => user.get('name'))
-      .filter((name) => !WHO_OPTIONS.includes(name as (typeof WHO_OPTIONS)[number]));
-
-    task.set('who', cycleWho(task.get('who'), [...WHO_OPTIONS, ...extra]));
+    task.set('who', toggleAssignee(normalizeWho(task.get('who')), name));
   }, []);
 }
 

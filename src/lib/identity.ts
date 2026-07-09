@@ -38,13 +38,3 @@ export function colorFor(name: string): string {
 
   return CURSOR_COLORS[hash(n) % CURSOR_COLORS.length] ?? '#C96F4A';
 }
-
-/**
- * Advances a task's assignee through the four defaults, then through any other
- * name that has joined the room. Unknown values restart at the first option.
- */
-export function cycleWho(current: string, options: readonly string[]): string {
-  const index = options.indexOf(current);
-
-  return options[(index + 1) % options.length] ?? current;
-}

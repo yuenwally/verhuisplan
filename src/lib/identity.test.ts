@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { avatarFor, colorFor, cycleWho } from '@/lib/identity';
-import { AVATAR_POOL, PIGICORN, SEEDED_USERS, WHO_OPTIONS } from '@/lib/plan-config';
+import { avatarFor, colorFor } from '@/lib/identity';
+import { AVATAR_POOL, PIGICORN, SEEDED_USERS } from '@/lib/plan-config';
 
 describe('avatarFor', () => {
   it('gives Willem Jan the monkey, however he spells it', () => {
@@ -52,24 +52,3 @@ describe('colorFor', () => {
   });
 });
 
-describe('cycleWho', () => {
-  const options = [...WHO_OPTIONS];
-
-  it('advances through the defaults and wraps', () => {
-    expect(cycleWho('Wally', options)).toBe('WJ');
-    expect(cycleWho('WJ', options)).toBe('Samen');
-    expect(cycleWho('Samen', options)).toBe('n.t.b.');
-    expect(cycleWho('n.t.b.', options)).toBe('Wally');
-  });
-
-  it('includes guests who have joined the room', () => {
-    const withGuest = [...options, 'Sanne'];
-
-    expect(cycleWho('n.t.b.', withGuest)).toBe('Sanne');
-    expect(cycleWho('Sanne', withGuest)).toBe('Wally');
-  });
-
-  it('restarts at the first option for an unknown assignee', () => {
-    expect(cycleWho('Onbekend', options)).toBe('Wally');
-  });
-});

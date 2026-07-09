@@ -55,10 +55,8 @@ export type MomentDef = {
 export const MOMENTS: readonly MomentDef[] = [
   { emoji: '🔑', label: 'Sleutels nieuwe woning', date: '2026-07-15' },
   { emoji: '🚚', label: 'Mogelijk al verhuizen', date: '2026-08-24' },
-  { emoji: '🏠', label: 'WJ in de woning', date: '2026-09-01' },
+  { emoji: '🏠', label: 'WJ in de woning', date: '2026-08-24' },
 ] as const;
-
-export const WHO_OPTIONS = ['Wally', 'WJ', 'Samen', 'n.t.b.'] as const;
 
 /**
  * An avatar is normally the emoji itself. Joyce's is a token, because a pig with

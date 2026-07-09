@@ -4,7 +4,11 @@ export type Task = {
   id: string;
   phase: PhaseId;
   title: string;
-  who: string;
+  /**
+   * Names of everyone assigned; empty means nobody. Old rooms may still hold a
+   * single string here, so read it through `normalizeWho`.
+   */
+  who: string[];
   /** Empty string, or an ISO `YYYY-MM-DD` date. */
   deadline: string;
   done: boolean;
