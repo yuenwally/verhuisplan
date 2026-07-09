@@ -1,0 +1,44 @@
+export type PhaseId = 1 | 2 | 3 | 4 | 5;
+
+export type Task = {
+  id: string;
+  phase: PhaseId;
+  title: string;
+  who: string;
+  /** Empty string, or an ISO `YYYY-MM-DD` date. */
+  deadline: string;
+  done: boolean;
+  doneBy: string;
+};
+
+export type Question = {
+  id: string;
+  text: string;
+  done: boolean;
+};
+
+export type Cost = {
+  id: string;
+  label: string;
+  /** Free text so a half-typed `1.2` survives a keystroke; parsed on read. */
+  amount: string;
+};
+
+export type ActivityEntry = {
+  id: string;
+  user: string;
+  avatar: string;
+  text: string;
+  ts: number;
+};
+
+export type KnownUser = {
+  name: string;
+  avatar: string;
+};
+
+export type CurrentUser = {
+  name: string;
+  avatar: string;
+  color: string;
+};

@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-ink-faint: var(--ink-faint);
+  --color-paper-sunken: var(--paper-sunken);
+
+  --font-sans: var(--font-nunito);
+  --font-hand: var(--font-caveat);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Paper and ink — the two surfaces the whole design rests on. */
+  --background: #f5eddf;
+  --foreground: #3b2f24;
+  --card: #fdf8ee;
+  --card-foreground: #3b2f24;
+  --popover: #fdf8ee;
+  --popover-foreground: #3b2f24;
+
+  /* Sunken paper: the board columns and the view-toggle track. */
+  --paper-sunken: #eadcbe;
+
+  /* Terracotta: the "Voeg toe" button and the cost total. */
+  --primary: #c96f4a;
+  --primary-foreground: #fdf8ee;
+
+  --secondary: #eadcbe;
+  --secondary-foreground: #6e5c42;
+
+  --muted: #eadcbe;
+  --muted-foreground: #8a785c;
+  --ink-faint: #b3a48d;
+
+  /* Tape yellow: the countdown pill and the phase-1 tape strip. */
+  --accent: #f2c14e;
+  --accent-foreground: #3b2f24;
+
+  /* Overdue deadlines. */
+  --destructive: #c0392b;
+  --destructive-foreground: #fdf8ee;
+
+  /* Completed checkboxes and phase progress. */
+  --success: #6fa26b;
+  --success-foreground: #fdf8ee;
+
+  --border: #e4d4b2;
+  --border-strong: #3b2f24;
+  --input: #e0cfac;
+  --ring: #c96f4a;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100vh;
+  }
+
+  a {
+    color: var(--primary);
+  }
+
+  a:hover {
+    color: #8a4429;
+  }
+
+  input[type='date'] {
+    color-scheme: light;
+  }
+
+  ::placeholder {
+    color: var(--ink-faint);
+  }
+}
+
+/* The faint diagonal corrugation behind the login card. */
+@utility bg-cardboard {
+  background: repeating-linear-gradient(
+    45deg,
+    #f5eddf,
+    #f5eddf 34px,
+    #f1e6d2 34px,
+    #f1e6d2 36px
+  );
+}
+
+/* Confetti falls once and is then unmounted; a keyframe is cheaper than 48 springs. */
+@keyframes vp-conf {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(75vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

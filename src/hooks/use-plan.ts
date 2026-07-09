@@ -1,0 +1,258 @@
+'use client';
+
+import { LiveObject, nanoid } from '@liveblocks/client';
+import { useMutation, useStorage } from '@liveblocks/react/suspense';
+import { truncate } from '@/lib/format';
+import { cycleWho } from '@/lib/identity';
+import { ACTIVITY_LIMIT, WHO_OPTIONS } from '@/lib/plan-config';
+import { moveWithinPhase } from '@/lib/reorder';
+import type { ActivityEntry, Cost, PhaseId, Question, Task } from '@/lib/types';
+import type { LiveList, LiveObject as LiveObjectType, User } from '@liveblocks/client';
+
+type Self = User<Liveblocks['Presence'], Liveblocks['UserMeta']>;
+type Root = LiveObjectType<Liveblocks['Storage']>;
+
+/** Newest first, capped — the feed is a glance, not an audit log. */
+function pushActivity(storage: Root, self: Self, text: string) {
+  const activity = storage.get('activity');
+
+  activity.insert(
+    new LiveObject<ActivityEntry>({
+      id: nanoid(),
+      user: self.info.name,
+      avatar: self.info.avatar,
+      text,
+      ts: Date.now(),
+    }),
+    0,
+  );
+
+  while (activity.length > ACTIVITY_LIMIT) {
+    activity.delete(activity.length - 1);
+  }
+}
+
+function findById<T extends { id: string }>(
+  list: LiveList<LiveObjectType<T>>,
+  id: string,
+): LiveObjectType<T> | undefined {
+  return list.find((item) => item.get('id') === id);
+}
+
+export function useTasks() {
+  return useStorage((root) => root.tasks);
+}
+
+export function useQuestions() {
+  return useStorage((root) => root.questions);
+}
+
+export function useCosts() {
+  return useStorage((root) => root.costs);
+}
+
+export function useActivity() {
+  return useStorage((root) => root.activity);
+}
+
+export function useKnownUsers() {
+  return useStorage((root) => root.users);
+}
+
+/** Records the arrival, once, so the activity feed opens with a hello. */
+export function useAnnounceArrival() {
+  return useMutation(({ storage, self }) => {
+    const users = storage.get('users');
+    const name = self.info.name;
+
+    if (!users.some((user) => user.get('name').toLowerCase() === name.toLowerCase())) {
+      users.push(new LiveObject({ name, avatar: self.info.avatar }));
+    }
+
+    pushActivity(storage, self, 'is ingelogd 👋');
+  }, []);
+}
+
+export function useAddTask() {
+  return useMutation(({ storage, self }, phase: PhaseId, title: string) => {
+    const trimmed = title.trim();
+
+    if (!trimmed) {
+      return;
+    }
+
+    storage.get('tasks').push(
+      new LiveObject<Task>({
+        id: nanoid(),
+        phase,
+        title: trimmed,
+        who: 'n.t.b.',
+        deadline: '',
+        done: false,
+        doneBy: '',
+      }),
+    );
+
+    pushActivity(storage, self, `voegde toe: “${truncate(trimmed, 48)}”`);
+  }, []);
+}
+
+/**
+ * Returns true when this toggle completed the whole phase, so the caller can
+ * fire confetti. Returns false otherwise.
+ */
+export function useToggleTask() {
+  return useMutation(({ storage, self }, id: string): boolean => {
+    const tasks = storage.get('tasks');
+    const task = findById(tasks, id);
+
+    if (!task) {
+      return false;
+    }
+
+    const done = !task.get('done');
+    task.update({ done, doneBy: done ? self.info.name : '' });
+
+    const verb = done ? 'vinkte af' : 'heropende';
+    pushActivity(storage, self, `${verb}: “${truncate(task.get('title'), 48)}”`);
+
+    if (!done) {
+      return false;
+    }
+
+    const phase = task.get('phase');
+    const siblings = tasks.filter((entry) => entry.get('phase') === phase);
+    const phaseComplete = siblings.every((entry) => entry.get('done'));
+
+    if (phaseComplete) {
+      pushActivity(storage, self, `🎉 rondde fase ${phase} af!`);
+    }
+
+    return phaseComplete;
+  }, []);
+}
+
+export function useCycleWho() {
+  return useMutation(({ storage }, id: string) => {
+    const task = findById(storage.get('tasks'), id);
+
+    if (!task) {
+      return;
+    }
+
+    const extra = storage
+      .get('users')
+      .map((user) => user.get('name'))
+      .filter((name) => !WHO_OPTIONS.includes(name as (typeof WHO_OPTIONS)[number]));
+
+    task.set('who', cycleWho(task.get('who'), [...WHO_OPTIONS, ...extra]));
+  }, []);
+}
+
+export function useSetDeadline() {
+  return useMutation(({ storage }, id: string, deadline: string) => {
+    findById(storage.get('tasks'), id)?.set('deadline', deadline);
+  }, []);
+}
+
+export function useDeleteTask() {
+  return useMutation(({ storage, self }, id: string) => {
+    const tasks = storage.get('tasks');
+    const index = tasks.findIndex((task) => task.get('id') === id);
+
+    if (index < 0) {
+      return;
+    }
+
+    const title = tasks.get(index)?.get('title') ?? '';
+    tasks.delete(index);
+    pushActivity(storage, self, `verwijderde: “${truncate(title, 40)}”`);
+  }, []);
+}
+
+export function useMoveTask() {
+  return useMutation(({ storage }, dragId: string, targetId: string) => {
+    const tasks = storage.get('tasks');
+    const flat = tasks.map((task) => ({ id: task.get('id'), phase: task.get('phase') }));
+    const move = moveWithinPhase(flat, dragId, targetId);
+
+    if (!move) {
+      return;
+    }
+
+    tasks.move(move.from, move.to);
+  }, []);
+}
+
+export function useAddQuestion() {
+  return useMutation(({ storage }, text: string) => {
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+      return;
+    }
+
+    storage.get('questions').push(new LiveObject<Question>({
+      id: nanoid(),
+      text: trimmed,
+      done: false,
+    }));
+  }, []);
+}
+
+export function useToggleQuestion() {
+  return useMutation(({ storage, self }, id: string) => {
+    const question = findById(storage.get('questions'), id);
+
+    if (!question) {
+      return;
+    }
+
+    const done = !question.get('done');
+    question.set('done', done);
+
+    if (done) {
+      pushActivity(storage, self, `beantwoordde: “${truncate(question.get('text'), 40)}”`);
+    }
+  }, []);
+}
+
+export function useDeleteQuestion() {
+  return useMutation(({ storage }, id: string) => {
+    const questions = storage.get('questions');
+    const index = questions.findIndex((question) => question.get('id') === id);
+
+    if (index >= 0) {
+      questions.delete(index);
+    }
+  }, []);
+}
+
+export function useAddCost() {
+  return useMutation(({ storage }, label: string) => {
+    const trimmed = label.trim();
+
+    if (!trimmed) {
+      return;
+    }
+
+    storage.get('costs').push(new LiveObject<Cost>({ id: nanoid(), label: trimmed, amount: '' }));
+  }, []);
+}
+
+export function useSetAmount() {
+  return useMutation(({ storage }, id: string, amount: string) => {
+    findById(storage.get('costs'), id)?.set('amount', amount);
+  }, []);
+}
+
+export function useDeleteCost() {
+  return useMutation(({ storage }, id: string) => {
+    const costs = storage.get('costs');
+    const index = costs.findIndex((cost) => cost.get('id') === id);
+
+    if (index >= 0) {
+      costs.delete(index);
+    }
+  }, []);
+}
