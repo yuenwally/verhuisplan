@@ -60,7 +60,7 @@ export function LoginScreen({ knownUsers, onLogin }: LoginScreenProps) {
         </div>
 
         <p className="mt-3 text-[13px] text-[#8A785C]">
-          Wally krijgt een 🦆, Willem Jan een 🐵. Iedereen mag meedoen.
+          Wally krijgt een 🦆, Willem Jan een 🐵, Joyce een 🐷🦄. Iedereen mag meedoen.
         </p>
 
         {knownUsers.length > 0 ? (

@@ -116,9 +116,10 @@ describe('sanitizeAmount', () => {
 });
 
 describe('whoLabel', () => {
-  it('decorates the four known assignees', () => {
+  it('decorates the known assignees', () => {
     expect(whoLabel('Wally')).toBe('🦆 Wally');
     expect(whoLabel('WJ')).toBe('🐵 WJ');
+    expect(whoLabel('Joyce')).toBe('🐷🦄 Joyce');
     expect(whoLabel('Samen')).toBe('🦆🐵 Samen');
     expect(whoLabel('n.t.b.')).toBe('· n.t.b.');
   });

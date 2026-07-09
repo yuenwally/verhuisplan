@@ -1,4 +1,5 @@
 import { LiveList, LiveObject } from '@liveblocks/client';
+import { SEEDED_USERS } from '@/lib/plan-config';
 import type { ActivityEntry, Cost, KnownUser, PhaseId, Question, Task } from '@/lib/types';
 
 type SeedTask = [phase: PhaseId, title: string, who: string];
@@ -43,11 +44,6 @@ const SEED_COSTS: readonly string[] = [
   'Sloop & afvoer',
 ] as const;
 
-const SEED_USERS: readonly KnownUser[] = [
-  { name: 'Wally', avatar: '🦆' },
-  { name: 'WJ', avatar: '🐵' },
-] as const;
-
 /**
  * The room's contents on first connect. Liveblocks applies this only when the
  * room has no storage yet, so it is safe to keep calling on every mount.
@@ -80,6 +76,6 @@ export function initialStorage() {
       })),
     ),
     activity: new LiveList<LiveObject<ActivityEntry>>([]),
-    users: new LiveList(SEED_USERS.map((user) => new LiveObject<KnownUser>({ ...user }))),
+    users: new LiveList(SEEDED_USERS.map((user) => new LiveObject<KnownUser>({ ...user }))),
   };
 }

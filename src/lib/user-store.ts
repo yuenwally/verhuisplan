@@ -1,13 +1,9 @@
 import { avatarFor, colorFor } from '@/lib/identity';
+import { SEEDED_USERS } from '@/lib/plan-config';
 import type { CurrentUser, KnownUser } from '@/lib/types';
 
 const USER_KEY = 'verhuisplanner_user_v1';
 const KNOWN_KEY = 'verhuisplanner_known_users_v1';
-
-const SEEDED_USERS: readonly KnownUser[] = [
-  { name: 'Wally', avatar: '🦆' },
-  { name: 'WJ', avatar: '🐵' },
-];
 
 const listeners = new Set<() => void>();
 

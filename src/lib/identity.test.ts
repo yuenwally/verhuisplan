@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { avatarFor, colorFor, cycleWho } from '@/lib/identity';
-import { AVATAR_POOL, WHO_OPTIONS } from '@/lib/plan-config';
+import { AVATAR_POOL, SEEDED_USERS, WHO_OPTIONS } from '@/lib/plan-config';
 
 describe('avatarFor', () => {
   it('gives Willem Jan the monkey, however he spells it', () => {
@@ -15,6 +15,12 @@ describe('avatarFor', () => {
     }
   });
 
+  it('gives Joyce the pig and its tiny unicorn', () => {
+    for (const name of ['Joyce', 'joyce', 'Joy']) {
+      expect(avatarFor(name)).toBe('🐷🦄');
+    }
+  });
+
   it('gives anyone else a stable animal from the pool', () => {
     const first = avatarFor('Sanne');
 
@@ -23,9 +29,20 @@ describe('avatarFor', () => {
     expect(avatarFor('sanne')).toBe(first);
   });
 
-  it('does not hand a guest the reserved emoji', () => {
-    expect(avatarFor('Sanne')).not.toBe('🦆');
-    expect(avatarFor('Sanne')).not.toBe('🐵');
+  it('does not hand a guest a reserved emoji', () => {
+    for (const reserved of ['🦆', '🐵', '🐷🦄']) {
+      expect(avatarFor('Sanne')).not.toBe(reserved);
+    }
+  });
+});
+
+describe('SEEDED_USERS', () => {
+  it('carries the same avatar that avatarFor derives from the name', () => {
+    // The login chip reads the seeded avatar; the cursor flag derives its own.
+    // If these drift, Joyce is a pig in one place and an owl in the other.
+    for (const user of SEEDED_USERS) {
+      expect(avatarFor(user.name)).toBe(user.avatar);
+    }
   });
 });
 

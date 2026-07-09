@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useActivity } from '@/hooks/use-plan';
 import { timeAgo } from '@/lib/format';
+import { listItemMotion } from '@/lib/motion';
 
 /** Re-renders once a minute so "zojuist" ages into "3 min geleden" on its own. */
 function useMinuteTick() {
@@ -29,11 +30,8 @@ export function ActivityCard() {
           {activity.map((entry) => (
             <motion.div
               key={entry.id}
-              layout
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              layout="position"
+              {...listItemMotion()}
               className="flex items-start gap-2.25 overflow-hidden"
             >
               <span className="text-[17px]">{entry.avatar}</span>

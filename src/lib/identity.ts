@@ -13,9 +13,14 @@ function hash(value: string): number {
 
 const WILLEM_JAN = /(^|\W)(wj|willem|willemjan|willem-jan|jan)($|\W)|willem/;
 const WALLY = /wall|wal($|\W)/;
+const JOYCE = /joyce|joy($|\W)/;
 
 export function avatarFor(name: string): string {
   const n = (name || '').toLowerCase();
+
+  if (JOYCE.test(n)) {
+    return '🐷🦄';
+  }
 
   if (WILLEM_JAN.test(n)) {
     return '🐵';

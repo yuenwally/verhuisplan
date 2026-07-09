@@ -1,4 +1,4 @@
-import type { PhaseId } from '@/lib/types';
+import type { KnownUser, PhaseId } from '@/lib/types';
 
 export type PhaseDef = {
   id: PhaseId;
@@ -59,6 +59,16 @@ export const MOMENTS: readonly MomentDef[] = [
 ] as const;
 
 export const WHO_OPTIONS = ['Wally', 'WJ', 'Samen', 'n.t.b.'] as const;
+
+/**
+ * The people the app knows before anyone has typed a name. Joyce asked for a pig
+ * with a tiny unicorn, and got both.
+ */
+export const SEEDED_USERS: readonly KnownUser[] = [
+  { name: 'Wally', avatar: '🦆' },
+  { name: 'WJ', avatar: '🐵' },
+  { name: 'Joyce', avatar: '🐷🦄' },
+] as const;
 
 /** Cursor and flash colours, drawn from the palette's accents. */
 export const CURSOR_COLORS = [

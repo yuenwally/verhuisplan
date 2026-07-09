@@ -103,6 +103,8 @@ export function whoLabel(who: string): string {
       return '🦆 Wally';
     case 'WJ':
       return '🐵 WJ';
+    case 'Joyce':
+      return '🐷🦄 Joyce';
     case 'Samen':
       return '🦆🐵 Samen';
     case 'n.t.b.':
