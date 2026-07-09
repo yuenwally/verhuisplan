@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { avatarFor, colorFor, cycleWho } from '@/lib/identity';
-import { AVATAR_POOL, SEEDED_USERS, WHO_OPTIONS } from '@/lib/plan-config';
+import { AVATAR_POOL, PIGICORN, SEEDED_USERS, WHO_OPTIONS } from '@/lib/plan-config';
 
 describe('avatarFor', () => {
   it('gives Willem Jan the monkey, however he spells it', () => {
@@ -15,9 +15,9 @@ describe('avatarFor', () => {
     }
   });
 
-  it('gives Joyce the pig and its tiny unicorn', () => {
+  it('gives Joyce the drawn pigicorn', () => {
     for (const name of ['Joyce', 'joyce', 'Joy']) {
-      expect(avatarFor(name)).toBe('🐷🦄');
+      expect(avatarFor(name)).toBe(PIGICORN);
     }
   });
 
@@ -29,8 +29,8 @@ describe('avatarFor', () => {
     expect(avatarFor('sanne')).toBe(first);
   });
 
-  it('does not hand a guest a reserved emoji', () => {
-    for (const reserved of ['🦆', '🐵', '🐷🦄']) {
+  it('does not hand a guest a reserved avatar', () => {
+    for (const reserved of ['🦆', '🐵', PIGICORN]) {
       expect(avatarFor('Sanne')).not.toBe(reserved);
     }
   });

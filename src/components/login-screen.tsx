@@ -2,7 +2,9 @@
 
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 import { Button } from '@/components/ui/button';
+import { PIGICORN } from '@/lib/plan-config';
 import type { KnownUser } from '@/lib/types';
 
 type LoginScreenProps = {
@@ -60,7 +62,9 @@ export function LoginScreen({ knownUsers, onLogin }: LoginScreenProps) {
         </div>
 
         <p className="mt-3 text-[13px] text-[#8A785C]">
-          Wally krijgt een 🦆, Willem Jan een 🐵, Joyce een 🐷🦄. Iedereen mag meedoen.
+          Wally krijgt een 🦆, Willem Jan een 🐵, Joyce een{' '}
+          <AvatarGlyph avatar={PIGICORN} className="size-[16px] align-[-0.3em]" />. Iedereen mag
+          meedoen.
         </p>
 
         {knownUsers.length > 0 ? (
@@ -74,7 +78,7 @@ export function LoginScreen({ knownUsers, onLogin }: LoginScreenProps) {
                   border-[#C9AE7C] bg-card px-3.5 py-2 text-[15px] font-bold text-foreground
                   transition-transform hover:-translate-y-0.5"
               >
-                <span className="text-lg">{user.avatar}</span>
+                <AvatarGlyph avatar={user.avatar} className="size-[18px] text-lg" />
                 {user.name}
               </button>
             ))}

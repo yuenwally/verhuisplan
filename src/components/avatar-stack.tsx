@@ -2,6 +2,7 @@
 
 import { shallow, useOthersMapped } from '@liveblocks/react/suspense';
 import { AnimatePresence, motion } from 'motion/react';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 /** Who else is in the room right now. Empty when you are alone. */
@@ -31,7 +32,7 @@ export function AvatarStack() {
                     text-lg"
                   style={{ borderColor: info.color }}
                 >
-                  {info.avatar}
+                  <AvatarGlyph avatar={info.avatar} className="size-[22px] text-lg" />
                 </div>
               </TooltipTrigger>
               <TooltipContent>{info.name} is ook online</TooltipContent>

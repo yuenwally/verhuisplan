@@ -1,3 +1,5 @@
+import { PIGICORN } from '@/lib/plan-config';
+
 /** Midnight today, so deadline comparisons ignore the time of day. */
 export function startOfToday(now: Date = new Date()): Date {
   const today = new Date(now);
@@ -96,21 +98,30 @@ export function truncate(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
-/** `Wally` → `🦆 Wally`. Unknown assignees keep their bare name. */
-export function whoLabel(who: string): string {
+export type WhoLabel = {
+  /** Avatar tokens to render before the name, via `<AvatarGlyph>`. */
+  avatars: string[];
+  name: string;
+};
+
+/**
+ * `Wally` → 🦆 + `Wally`. Returns the avatars separately rather than a single
+ * string, because Joyce's is an SVG rather than a character.
+ */
+export function whoLabel(who: string): WhoLabel {
   switch (who) {
     case 'Wally':
-      return '🦆 Wally';
+      return { avatars: ['🦆'], name: 'Wally' };
     case 'WJ':
-      return '🐵 WJ';
+      return { avatars: ['🐵'], name: 'WJ' };
     case 'Joyce':
-      return '🐷🦄 Joyce';
+      return { avatars: [PIGICORN], name: 'Joyce' };
     case 'Samen':
-      return '🦆🐵 Samen';
+      return { avatars: ['🦆', '🐵'], name: 'Samen' };
     case 'n.t.b.':
-      return '· n.t.b.';
+      return { avatars: ['·'], name: 'n.t.b.' };
     default:
-      return who;
+      return { avatars: [], name: who };
   }
 }
 

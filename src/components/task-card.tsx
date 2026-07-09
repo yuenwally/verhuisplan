@@ -5,8 +5,9 @@ import { useId } from 'react';
 import { useFlash } from '@/components/flash-provider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { WhoBadge } from '@/components/who-badge';
 import { useTaskActions } from '@/hooks/use-task-actions';
-import { formatDeadlineShort, isOverdue, tint, whoLabel } from '@/lib/format';
+import { formatDeadlineShort, isOverdue, tint } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import type { DragHandlers } from '@/hooks/use-drag-reorder';
@@ -65,7 +66,7 @@ export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
             className="cursor-pointer rounded-full border-[1.5px] border-input bg-background px-2
               py-0.5 text-[11.5px] font-extrabold text-secondary-foreground"
           >
-            {whoLabel(task.who)}
+            <WhoBadge who={task.who} glyphClassName="size-[13px] text-[11px]" />
           </button>
           <span
             className={cn(

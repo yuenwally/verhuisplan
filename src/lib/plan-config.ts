@@ -61,13 +61,18 @@ export const MOMENTS: readonly MomentDef[] = [
 export const WHO_OPTIONS = ['Wally', 'WJ', 'Samen', 'n.t.b.'] as const;
 
 /**
- * The people the app knows before anyone has typed a name. Joyce asked for a pig
- * with a tiny unicorn, and got both.
+ * An avatar is normally the emoji itself. Joyce's is a token, because a pig with
+ * a tiny unicorn on its head is not in Unicode and has to be drawn — see
+ * `components/pigicorn.tsx`. Render avatars through `<AvatarGlyph>`, never as
+ * bare text, or Joyce shows up as the literal word.
  */
+export const PIGICORN = 'pigicorn';
+
+/** The people the app knows before anyone has typed a name. */
 export const SEEDED_USERS: readonly KnownUser[] = [
   { name: 'Wally', avatar: '🦆' },
   { name: 'WJ', avatar: '🐵' },
-  { name: 'Joyce', avatar: '🐷🦄' },
+  { name: 'Joyce', avatar: PIGICORN },
 ] as const;
 
 /** Cursor and flash colours, drawn from the palette's accents. */

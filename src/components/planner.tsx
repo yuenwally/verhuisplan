@@ -4,6 +4,7 @@ import { useStatus } from '@liveblocks/react/suspense';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityCard } from '@/components/activity-card';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 import { AvatarStack } from '@/components/avatar-stack';
 import { BoardView } from '@/components/board-view';
 import { CostsCard } from '@/components/costs-card';
@@ -97,7 +98,7 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
               className="flex items-center gap-2 rounded-full border-2 border-[#E0CFAC] bg-card
                 py-1.5 pr-3.5 pl-2"
             >
-              <span className="text-[22px]">{user.avatar}</span>
+              <AvatarGlyph avatar={user.avatar} className="size-[22px] text-[22px]" />
               <span className="text-[15px] font-extrabold">{user.name}</span>
             </div>
             <Button

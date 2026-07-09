@@ -1,4 +1,4 @@
-import { AVATAR_POOL, CURSOR_COLORS } from '@/lib/plan-config';
+import { AVATAR_POOL, CURSOR_COLORS, PIGICORN } from '@/lib/plan-config';
 
 /** Stable, order-independent hash so a name always maps to the same avatar and colour. */
 function hash(value: string): number {
@@ -19,7 +19,7 @@ export function avatarFor(name: string): string {
   const n = (name || '').toLowerCase();
 
   if (JOYCE.test(n)) {
-    return '🐷🦄';
+    return PIGICORN;
   }
 
   if (WILLEM_JAN.test(n)) {

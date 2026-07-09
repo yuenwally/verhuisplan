@@ -2,6 +2,7 @@
 
 import { shallow, useOthersMapped } from '@liveblocks/react/suspense';
 import { AnimatePresence, motion } from 'motion/react';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 
 /** Shows what other people are typing into this phase's add-input, as they type. */
 export function TypingGhost({ phase, className }: { phase: number; className?: string }) {
@@ -32,7 +33,7 @@ export function TypingGhost({ phase, className }: { phase: number; className?: s
           className={className}
           style={{ color: typist.color }}
         >
-          <span aria-hidden>{typist.avatar}</span>
+          <AvatarGlyph avatar={typist.avatar} className="size-[14px] text-sm" />
           <span className="truncate italic opacity-70">{typist.text}</span>
           <span className="animate-pulse">▌</span>
         </motion.div>

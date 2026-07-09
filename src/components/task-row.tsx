@@ -6,9 +6,10 @@ import { useFlash } from '@/components/flash-provider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { WhoBadge } from '@/components/who-badge';
 import { useDeleteTask, useSetDeadline } from '@/hooks/use-plan';
 import { useTaskActions } from '@/hooks/use-task-actions';
-import { isOverdue, tint, whoLabel } from '@/lib/format';
+import { isOverdue, tint } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import type { DragHandlers } from '@/hooks/use-drag-reorder';
@@ -83,7 +84,7 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
             className="cursor-pointer rounded-full border-[1.5px] border-input bg-background px-2.5
               py-1 text-[12.5px] font-extrabold whitespace-nowrap text-secondary-foreground"
           >
-            {whoLabel(task.who)}
+            <WhoBadge who={task.who} glyphClassName="size-[15px] text-[13px]" />
           </button>
         </TooltipTrigger>
         <TooltipContent>Klik om toe te wijzen</TooltipContent>

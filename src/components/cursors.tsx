@@ -3,6 +3,7 @@
 import { useOthers, useUpdateMyPresence } from '@liveblocks/react/suspense';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect } from 'react';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 import type { RefObject } from 'react';
 
 /**
@@ -88,7 +89,7 @@ export function Cursors({ containerRef }: { containerRef: RefObject<HTMLElement 
                   text-xs font-extrabold whitespace-nowrap text-white shadow-sm"
                 style={{ background: info.color }}
               >
-                <span>{info.avatar}</span>
+                <AvatarGlyph avatar={info.avatar} className="size-[14px] text-xs" />
                 {info.name}
               </div>
             </motion.div>

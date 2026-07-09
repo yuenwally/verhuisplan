@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
+import { AvatarGlyph } from '@/components/avatar-glyph';
 import { useActivity } from '@/hooks/use-plan';
 import { timeAgo } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
@@ -34,7 +35,7 @@ export function ActivityCard() {
               {...listItemMotion()}
               className="flex items-start gap-2.25 overflow-hidden"
             >
-              <span className="text-[17px]">{entry.avatar}</span>
+              <AvatarGlyph avatar={entry.avatar} className="size-[17px] text-[17px]" />
               <div className="flex-1">
                 <div className="text-[13px] leading-[1.35] font-semibold">
                   <b>{entry.user}</b> {entry.text}
