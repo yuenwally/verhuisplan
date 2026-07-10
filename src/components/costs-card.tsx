@@ -8,7 +8,17 @@ import { Label } from '@/components/ui/label';
 import { useAddCost, useCosts, useDeleteCost, useSetAmount } from '@/hooks/use-plan';
 import { formatCostTotal, sanitizeAmount, tint } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 import type { Cost } from '@/lib/types';
+
+/**
+ * The row clips its overflow so it can collapse on exit, and it is rounded to
+ * carry the edit-flash tint. Children therefore have to sit inside those rounded
+ * corners, or the corners bite into the amount field. `ROW_INSET` applies to the
+ * add-input too, so the two fields keep the same right edge.
+ */
+const ROW_PADDING_Y = 3;
+const ROW_INSET = 'px-1.5';
 
 function CostRow({ cost }: { cost: Cost }) {
   const setAmount = useSetAmount();
@@ -21,10 +31,12 @@ function CostRow({ cost }: { cost: Cost }) {
   return (
     <motion.div
       layout="position"
-      {...listItemMotion()}
+      {...listItemMotion(ROW_PADDING_Y)}
       style={flashColor ? { background: tint(flashColor) } : undefined}
-      className="group flex items-center gap-2 overflow-hidden rounded-md transition-colors
-        duration-300"
+      className={cn(
+        'group flex items-center gap-2 overflow-hidden rounded-md transition-colors duration-300',
+        ROW_INSET,
+      )}
     >
       {/* The delete button sits before the label rather than after the field, so
           the field can run to the card's edge and line up with the add-input. */}
@@ -40,7 +52,7 @@ function CostRow({ cost }: { cost: Cost }) {
       </button>
       <Label
         htmlFor={amountId}
-        className="min-w-0 flex-[2] cursor-pointer truncate text-[13.5px] font-bold"
+        className="min-w-0 flex-[2] cursor-pointer text-[13.5px] leading-snug font-bold"
       >
         {cost.label}
       </Label>
@@ -93,7 +105,7 @@ export function CostsCard() {
       </div>
 
       <AddInput
-        className="mt-3"
+        className={cn('mt-3', ROW_INSET)}
         placeholder="+ kostenpost…"
         inputClassName="rounded-[4px] px-2.75 py-2 text-[13px]"
         onSubmit={addCost}

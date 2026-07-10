@@ -12,6 +12,15 @@ import { listItemMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import type { Question } from '@/lib/types';
 
+/**
+ * The row clips its overflow so it can collapse on exit, and it is rounded to
+ * carry the edit-flash tint. Children therefore have to sit inside those rounded
+ * corners, or the corners bite into them. `ROW_INSET` keeps the add-input below
+ * lined up with them.
+ */
+const ROW_PADDING_Y = 3;
+const ROW_INSET = 'px-1.5';
+
 function QuestionRow({ question }: { question: Question }) {
   const toggleQuestion = useToggleQuestion();
   const deleteQuestion = useDeleteQuestion();
@@ -23,9 +32,12 @@ function QuestionRow({ question }: { question: Question }) {
   return (
     <motion.div
       layout="position"
-      {...listItemMotion()}
+      {...listItemMotion(ROW_PADDING_Y)}
       style={flashColor ? { background: tint(flashColor) } : undefined}
-      className="flex items-start gap-2.5 overflow-hidden rounded-md transition-colors duration-300"
+      className={cn(
+        'flex items-start gap-2.5 overflow-hidden rounded-md transition-colors duration-300',
+        ROW_INSET,
+      )}
     >
       <Checkbox
         id={checkboxId}
@@ -76,7 +88,7 @@ export function QuestionsCard() {
       </div>
 
       <AddInput
-        className="mt-3"
+        className={cn('mt-3', ROW_INSET)}
         placeholder="+ vraag toevoegen…"
         inputClassName="rounded-[9px] px-2.75 py-2 text-[13px]"
         onSubmit={addQuestion}
