@@ -17,7 +17,7 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: 'Verhuisplan 📦',
-  description: 'Het gedeelde werkdocument van Wally & WJ — maar dan leuk.',
+  description: 'Het gedeelde werkdocument van Wally, WJ & Joyce. Maar dan leuk.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

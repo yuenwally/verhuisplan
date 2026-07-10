@@ -54,7 +54,7 @@ export type MomentDef = {
 
 export const MOMENTS: readonly MomentDef[] = [
   { emoji: '🔑', label: 'Sleutels nieuwe woning', date: '2026-07-15' },
-  { emoji: '🚚', label: 'Mogelijk al verhuizen', date: '2026-08-24' },
+  { emoji: '🚚', label: 'Verhuizen Joyce & Wally', date: '2026-08-24' },
   { emoji: '🏠', label: 'WJ in de woning', date: '2026-08-24' },
 ] as const;
 

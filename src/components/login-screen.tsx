@@ -1,10 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { useState } from 'react';
 import { AvatarGlyph } from '@/components/avatar-glyph';
-import { Button } from '@/components/ui/button';
-import { PIGICORN } from '@/lib/plan-config';
 import type { KnownUser } from '@/lib/types';
 
 type LoginScreenProps = {
@@ -13,8 +10,6 @@ type LoginScreenProps = {
 };
 
 export function LoginScreen({ knownUsers, onLogin }: LoginScreenProps) {
-  const [name, setName] = useState('');
-
   return (
     <div className="bg-cardboard flex min-h-screen items-center justify-center p-6">
       <motion.div
@@ -31,59 +26,31 @@ export function LoginScreen({ knownUsers, onLogin }: LoginScreenProps) {
         />
         <h1 className="mb-1.5 font-hand text-[44px] leading-none font-bold">Verhuisplan 📦</h1>
         <p className="mb-6 text-[15px] text-secondary-foreground">
-          Het gedeelde werkdocument van Wally &amp; WJ — maar dan leuk.
+          Het gedeelde werkdocument van Wally, WJ &amp; Joyce. Maar dan leuk.
         </p>
 
-        <label
-          htmlFor="login-name"
-          className="mb-2 block text-sm font-extrabold tracking-[0.08em] text-secondary-foreground
+        <p
+          className="mb-3 text-sm font-extrabold tracking-[0.08em] text-secondary-foreground
             uppercase"
         >
           Wie ben je?
-        </label>
-        <div className="flex gap-2.5">
-          <input
-            id="login-name"
-            value={name}
-            autoFocus
-            placeholder="Typ je naam…"
-            onChange={(event) => setName(event.target.value)}
-            onKeyDown={(event) => event.key === 'Enter' && onLogin(name)}
-            className="min-w-0 flex-1 rounded-[10px] border-2 border-border-strong bg-card px-4
-              py-3 text-[17px] font-bold text-foreground outline-none"
-          />
-          <Button
-            onClick={() => onLogin(name)}
-            className="h-auto rounded-[10px] bg-foreground px-5 py-3 text-base font-extrabold
-              text-background hover:bg-foreground/90"
-          >
-            Start →
-          </Button>
-        </div>
-
-        <p className="mt-3 text-[13px] text-[#8A785C]">
-          Wally krijgt een 🦆, Willem Jan een 🐵, Joyce een{' '}
-          <AvatarGlyph avatar={PIGICORN} className="size-[16px] align-[-0.3em]" />. Iedereen mag
-          meedoen.
         </p>
 
-        {knownUsers.length > 0 ? (
-          <div className="mt-4.5 flex flex-wrap gap-2">
-            {knownUsers.map((user) => (
-              <button
-                key={user.name}
-                type="button"
-                onClick={() => onLogin(user.name)}
-                className="flex cursor-pointer items-center gap-[7px] rounded-full border-2
-                  border-[#C9AE7C] bg-card px-3.5 py-2 text-[15px] font-bold text-foreground
-                  transition-transform hover:-translate-y-0.5"
-              >
-                <AvatarGlyph avatar={user.avatar} className="size-[18px] text-lg" />
-                {user.name}
-              </button>
-            ))}
-          </div>
-        ) : null}
+        <div className="flex flex-wrap gap-2.5">
+          {knownUsers.map((user) => (
+            <button
+              key={user.name}
+              type="button"
+              onClick={() => onLogin(user.name)}
+              className="flex cursor-pointer items-center gap-2 rounded-[10px] border-2
+                border-border-strong bg-card px-4 py-3 text-[17px] font-bold text-foreground
+                transition-transform hover:-translate-y-0.5"
+            >
+              <AvatarGlyph avatar={user.avatar} className="size-[22px] text-[20px]" />
+              {user.name}
+            </button>
+          ))}
+        </div>
       </motion.div>
     </div>
   );

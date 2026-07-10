@@ -39,8 +39,8 @@ export function MissingKeyNotice() {
       </p>
       <p className="text-[13px] text-ink-faint">
         Zet <code className="font-mono">LIVEBLOCKS_SECRET_KEY</code> in{' '}
-        <code className="font-mono">.env.local</code> — haal een sleutel op via
-        liveblocks.io/dashboard — en start de server opnieuw.
+        <code className="font-mono">.env.local</code>, haal een sleutel op via
+        liveblocks.io/dashboard, en start de server opnieuw.
       </p>
     </Notice>
   );

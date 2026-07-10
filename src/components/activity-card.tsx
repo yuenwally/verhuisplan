@@ -48,7 +48,7 @@ export function ActivityCard() {
 
         {activity.length === 0 ? (
           <p className="text-[13px] font-semibold text-ink-faint">
-            Nog geen activiteit — vink iets af!
+            Nog geen activiteit. Vink iets af!
           </p>
         ) : null}
       </div>

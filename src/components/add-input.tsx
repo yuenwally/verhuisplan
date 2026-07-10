@@ -78,7 +78,7 @@ export function AddInput({
         <Button
           type="button"
           onClick={submit}
-          className="h-auto rounded-[10px] px-4 py-2.5 text-sm font-extrabold"
+          className="h-auto cursor-pointer rounded-[10px] px-4 py-2.5 text-sm font-extrabold"
         >
           {buttonLabel}
         </Button>

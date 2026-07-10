@@ -17,6 +17,9 @@ import type { Task } from '@/lib/types';
 const DRAG_BG = '#F2E7CF';
 const ROW_PADDING_Y = 8;
 
+// The row has no corner radius on purpose: its only visible edge is the dashed
+// top border, and a radius bends that line into a curve at each end.
+
 /** The assignee pill and the deadline field share this, so they line up. */
 const CONTROL_HEIGHT = 'h-6';
 
@@ -43,8 +46,8 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
       onDragOver={(event) => event.preventDefault()}
       onDragEnd={drag.onDragEnd}
       style={{ background }}
-      className="flex items-center gap-2.5 overflow-hidden rounded-[10px] border-t border-dashed
-        border-border px-1.5 transition-colors duration-300"
+      className="flex items-center gap-2.5 overflow-hidden border-t border-dashed border-border
+        px-1.5 transition-colors duration-300"
     >
       <span aria-hidden className="cursor-grab text-[15px] text-[#C9B48C] select-none">
         ⠿

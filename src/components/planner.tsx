@@ -38,7 +38,7 @@ function nextMomentLabel(): string {
 
 type PlannerProps = {
   user: CurrentUser;
-  /** True only on the connect right after typing a name, so reloads stay quiet. */
+  /** True only on the connect right after picking a name, so reloads stay quiet. */
   announce: boolean;
   onLogout: () => void;
 };
@@ -104,8 +104,8 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
             <Button
               variant="ghost"
               onClick={onLogout}
-              className="h-auto rounded-full border-2 border-[#D8C6A0] px-3 py-2 text-[13px]
-                font-bold text-secondary-foreground hover:bg-card"
+              className="h-auto cursor-pointer rounded-full border-2 border-[#D8C6A0] px-3 py-2
+                text-[13px] font-bold text-secondary-foreground hover:bg-card"
             >
               Uitloggen
             </Button>
@@ -117,14 +117,14 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
             <TabsList className="h-auto gap-1.5 rounded-xl bg-paper-sunken p-[5px]">
               <TabsTrigger
                 value="lijst"
-                className="rounded-[9px] px-4.5 py-2 text-sm font-extrabold
+                className="cursor-pointer rounded-[9px] px-4.5 py-2 text-sm font-extrabold
                   data-[state=active]:bg-foreground data-[state=active]:text-background"
               >
                 ☰ Lijst
               </TabsTrigger>
               <TabsTrigger
                 value="bord"
-                className="rounded-[9px] px-4.5 py-2 text-sm font-extrabold
+                className="cursor-pointer rounded-[9px] px-4.5 py-2 text-sm font-extrabold
                   data-[state=active]:bg-foreground data-[state=active]:text-background"
               >
                 ▦ Bord
