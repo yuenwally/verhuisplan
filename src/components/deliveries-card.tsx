@@ -63,7 +63,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
           onClick={() => deleteDelivery(delivery.id)}
           className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-[13px]
             leading-none text-[#C9B48C] opacity-0 transition group-hover:opacity-100
-            hover:text-destructive focus-visible:opacity-100"
+            hover:text-destructive focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
         >
           ✕
         </button>

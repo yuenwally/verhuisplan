@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { AvatarGlyph } from '@/components/avatar-glyph';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import { useAddComment, useDeleteComment, useTaskComments } from '@/hooks/use-plan';
 import { timeAgo } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
@@ -13,8 +14,9 @@ import type { KeyboardEvent } from 'react';
 
 /**
  * The icon is only visible once a task has a comment, as asked. With none it
- * still has to be reachable, so it fades in on hover or keyboard focus of the
- * row — otherwise a first comment could never be written.
+ * still has to be reachable: a mouse reveals it by hovering the row, and touch,
+ * which cannot hover, always sees it. Otherwise a first comment could never be
+ * written on a phone.
  */
 export function TaskComments({
   taskId,
@@ -26,6 +28,7 @@ export function TaskComments({
   className?: string;
 }) {
   const comments = useTaskComments(taskId);
+  const isTouch = useIsTouch();
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
   const [draft, setDraft] = useState('');
@@ -63,9 +66,10 @@ export function TaskComments({
           className={cn(
             `flex shrink-0 cursor-pointer items-center gap-0.5 rounded-md px-1 text-[#C9B48C]
             transition hover:text-primary focus-visible:opacity-100`,
-            hasComments
-              ? 'text-primary opacity-100'
+            hasComments || isTouch
+              ? 'opacity-100'
               : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100',
+            hasComments && 'text-primary',
             className,
           )}
         >
@@ -114,7 +118,7 @@ export function TaskComments({
                     className="flex size-4 shrink-0 cursor-pointer items-center justify-center
                       text-[13px] leading-none text-[#C9B48C] opacity-0 transition
                       group-hover/comment:opacity-100 hover:text-destructive
-                      focus-visible:opacity-100"
+                      focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
                   >
                     ✕
                   </button>

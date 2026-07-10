@@ -450,9 +450,13 @@ function ChartArea({
 }) {
   const { parentRef, width } = useParentSize({ debounceTime: 60, ignoreDimensions: ['height'] });
 
+  // Below the chart's minimum the axis and lane labels collide, so on a phone it
+  // scrolls sideways rather than compressing into illegibility.
   return (
-    <div ref={parentRef} className="w-full">
-      {width > 0 ? <Chart tasks={tasks} deliveries={deliveries} width={width} /> : null}
+    <div className="-mx-1 overflow-x-auto px-1">
+      <div ref={parentRef} className="w-full min-w-[680px]">
+        {width > 0 ? <Chart tasks={tasks} deliveries={deliveries} width={width} /> : null}
+      </div>
     </div>
   );
 }

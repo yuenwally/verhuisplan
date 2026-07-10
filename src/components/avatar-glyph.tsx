@@ -13,8 +13,13 @@ export function AvatarGlyph({ avatar, className }: { avatar: string; className?:
     return <Pigicorn className={className} />;
   }
 
+  // An emoji is drawn against its line box, not its element box, so a bare span
+  // sits low beside the text next to it. Centring it in a flex box pins it.
   return (
-    <span aria-hidden className={cn('inline-block leading-none', className)}>
+    <span
+      aria-hidden
+      className={cn('inline-flex shrink-0 items-center justify-center leading-none', className)}
+    >
       {avatar}
     </span>
   );

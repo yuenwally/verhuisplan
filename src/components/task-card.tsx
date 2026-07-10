@@ -37,11 +37,7 @@ export function TaskCard({
     <motion.div
       layout="position"
       {...listItemMotion(CARD_PADDING_Y)}
-      draggable
-      onDragStart={() => drag.onDragStart(task.id)}
-      onDragEnter={() => drag.onDragEnter(task.id)}
-      onDragOver={(event) => event.preventDefault()}
-      onDragEnd={drag.onDragEnd}
+      data-task-id={task.id}
       style={flashColor ? { background: tint(flashColor) } : undefined}
       className="group overflow-hidden rounded-[10px] border-[1.5px] border-border bg-card px-2.5
         shadow-[0_2px_6px_rgba(90,70,40,0.06)] transition-colors duration-300"
@@ -50,6 +46,14 @@ export function TaskCard({
           to animate opacity without the two fighting over the same inline style. */}
       <div className={cn('transition-opacity duration-300', task.done && 'opacity-55')}>
         <div className="flex items-start gap-2">
+          <span
+            {...drag.handleProps(task.id)}
+            aria-hidden
+            className="mt-0.5 shrink-0 cursor-grab touch-none text-[13px] text-[#C9B48C] select-none
+              active:cursor-grabbing"
+          >
+            ⠿
+          </span>
           <Checkbox
             id={checkboxId}
             checked={task.done}

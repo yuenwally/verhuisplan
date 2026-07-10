@@ -4,6 +4,7 @@ import { useOthers, useUpdateMyPresence } from '@liveblocks/react/suspense';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect } from 'react';
 import { AvatarGlyph } from '@/components/avatar-glyph';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import type { RefObject } from 'react';
 
 /**
@@ -15,11 +16,14 @@ import type { RefObject } from 'react';
 export function Cursors({ containerRef }: { containerRef: RefObject<HTMLElement | null> }) {
   const others = useOthers();
   const updateMyPresence = useUpdateMyPresence();
+  const isTouch = useIsTouch();
 
   useEffect(() => {
     const container = containerRef.current;
 
-    if (!container) {
+    // A finger has no hover position to broadcast, and the phone's own pointer
+    // events would pin a stale cursor wherever it last tapped.
+    if (!container || isTouch) {
       return;
     }
 
@@ -46,7 +50,7 @@ export function Cursors({ containerRef }: { containerRef: RefObject<HTMLElement 
       window.removeEventListener('pointermove', onPointerMove);
       container.removeEventListener('pointerleave', onPointerLeave);
     };
-  }, [containerRef, updateMyPresence]);
+  }, [containerRef, updateMyPresence, isTouch]);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden">
