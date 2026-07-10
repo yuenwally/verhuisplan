@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildTimeline, dodgeOverlaps, statusOf } from '@/lib/timeline';
-import type { PhaseId, Task } from '@/lib/types';
+import { buildTimeline, dodgeOverlaps, packDeliveries, statusOf } from '@/lib/timeline';
+import type { Delivery, PhaseId, Task } from '@/lib/types';
 
 const TODAY = new Date('2026-07-09T00:00:00');
 
@@ -53,13 +53,93 @@ describe('dodgeOverlaps', () => {
   });
 });
 
+function delivery(label: string, start: string, end: string): Delivery {
+  return { id: label, label, start, end };
+}
+
+describe('packDeliveries', () => {
+  it('keeps non-overlapping windows on one lane', () => {
+    const lanes = packDeliveries([
+      delivery('a', '2026-07-01', '2026-07-05'),
+      delivery('b', '2026-07-10', '2026-07-14'),
+    ]);
+
+    expect(lanes).toHaveLength(1);
+    expect(lanes[0]?.map((bar) => bar.delivery.label)).toEqual(['a', 'b']);
+  });
+
+  it('pushes an overlapping window onto its own lane', () => {
+    const lanes = packDeliveries([
+      delivery('a', '2026-07-01', '2026-07-10'),
+      delivery('b', '2026-07-05', '2026-07-12'),
+    ]);
+
+    expect(lanes).toHaveLength(2);
+  });
+
+  it('treats touching windows as overlapping, so the bars do not abut', () => {
+    const lanes = packDeliveries([
+      delivery('a', '2026-07-01', '2026-07-10'),
+      delivery('b', '2026-07-10', '2026-07-14'),
+    ]);
+
+    expect(lanes).toHaveLength(2);
+  });
+
+  it('packs the real five into three lanes', () => {
+    const lanes = packDeliveries([
+      delivery('Renovlies', '2026-07-20', '2026-07-30'),
+      delivery('X2O', '2026-07-27', '2026-08-01'),
+      delivery('Tegels / Vloer', '2026-08-17', '2026-08-24'),
+      delivery('Auping bed', '2026-08-24', '2026-08-30'),
+      delivery('Kitchen', '2026-08-24', '2026-08-30'),
+    ]);
+
+    expect(lanes.map((lane) => lane.map((bar) => bar.delivery.label))).toEqual([
+      ['Renovlies', 'Tegels / Vloer'],
+      ['X2O', 'Auping bed'],
+      ['Kitchen'],
+    ]);
+  });
+
+  it('sorts by start date regardless of input order', () => {
+    const lanes = packDeliveries([
+      delivery('late', '2026-08-01', '2026-08-05'),
+      delivery('early', '2026-07-01', '2026-07-05'),
+    ]);
+
+    expect(lanes[0]?.map((bar) => bar.delivery.label)).toEqual(['early', 'late']);
+  });
+
+  it('skips a delivery that is not scheduled yet', () => {
+    const lanes = packDeliveries([
+      delivery('geen datum', '', ''),
+      delivery('half', '2026-07-01', ''),
+    ]);
+
+    expect(lanes).toEqual([]);
+  });
+});
+
 describe('buildTimeline', () => {
   const moments = ['2026-08-24'];
+
+  it('stretches the domain to cover a delivery beyond the last deadline', () => {
+    const timeline = buildTimeline(
+      [task({ deadline: '2026-07-20' })],
+      [],
+      [delivery('Kitchen', '2026-08-24', '2026-09-30')],
+      TODAY,
+    );
+
+    expect(timeline.domain[1].getTime()).toBeGreaterThan(new Date('2026-09-30T00:00').getTime());
+  });
 
   it('keeps only tasks that carry a deadline, and counts the rest', () => {
     const timeline = buildTimeline(
       [task({ deadline: '2026-07-20' }), task(), task()],
       moments,
+      [],
       TODAY,
     );
 
@@ -71,6 +151,7 @@ describe('buildTimeline', () => {
     const timeline = buildTimeline(
       [task({ phase: 3 as PhaseId, deadline: '2026-07-20' })],
       moments,
+      [],
       TODAY,
     );
 
@@ -85,6 +166,7 @@ describe('buildTimeline', () => {
         task({ title: 'vroeg', deadline: '2026-07-15' }),
       ],
       moments,
+      [],
       TODAY,
     );
 
@@ -92,7 +174,7 @@ describe('buildTimeline', () => {
   });
 
   it('spans from before the earliest mark to after the latest', () => {
-    const timeline = buildTimeline([task({ deadline: '2026-07-20' })], moments, TODAY);
+    const timeline = buildTimeline([task({ deadline: '2026-07-20' })], moments, [], TODAY);
     const [start, end] = timeline.domain;
 
     // Today (9 July) is earlier than the only deadline, so it anchors the start.
@@ -101,7 +183,7 @@ describe('buildTimeline', () => {
   });
 
   it('still produces a usable domain when nothing is dated', () => {
-    const timeline = buildTimeline([task(), task()], [], TODAY);
+    const timeline = buildTimeline([task(), task()], [], [], TODAY);
     const [start, end] = timeline.domain;
 
     expect(timeline.rows).toHaveLength(0);

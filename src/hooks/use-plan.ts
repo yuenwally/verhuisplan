@@ -6,7 +6,8 @@ import { normalizeWho, toggleAssignee } from '@/lib/assignees';
 import { truncate } from '@/lib/format';
 import { ACTIVITY_LIMIT, SEEDED_USERS } from '@/lib/plan-config';
 import { moveWithinPhase } from '@/lib/reorder';
-import type { ActivityEntry, Cost, PhaseId, Question, Task } from '@/lib/types';
+import { seedDeliveries } from '@/lib/seed';
+import type { ActivityEntry, Cost, Delivery, PhaseId, Question, Task } from '@/lib/types';
 import type { LiveList, LiveObject as LiveObjectType, User } from '@liveblocks/client';
 
 type Self = User<Liveblocks['Presence'], Liveblocks['UserMeta']>;
@@ -57,6 +58,64 @@ export function useActivity() {
 
 export function useKnownUsers() {
   return useStorage((root) => root.users);
+}
+
+/**
+ * Undefined in rooms created before deliveries existed, until `useEnsureDeliveries`
+ * has run. Callers must treat that as "not loaded yet", not as "none".
+ */
+export function useDeliveries() {
+  return useStorage((root) => root.deliveries ?? null);
+}
+
+/**
+ * Adds the `deliveries` list to a room that predates it. `initialStorage` only
+ * applies to a room with no storage at all, so an existing room would otherwise
+ * never gain the key and every read would come back undefined.
+ */
+export function useEnsureDeliveries() {
+  return useMutation(({ storage }) => {
+    if (storage.get('deliveries') === undefined) {
+      storage.set('deliveries', seedDeliveries());
+    }
+  }, []);
+}
+
+export function useAddDelivery() {
+  return useMutation(({ storage }, label: string) => {
+    const trimmed = label.trim();
+
+    if (!trimmed) {
+      return;
+    }
+
+    storage.get('deliveries')?.push(
+      new LiveObject<Delivery>({ id: nanoid(), label: trimmed, start: '', end: '' }),
+    );
+  }, []);
+}
+
+export function useSetDeliveryDate() {
+  return useMutation(({ storage }, id: string, field: 'start' | 'end', value: string) => {
+    const deliveries = storage.get('deliveries');
+
+    if (!deliveries) {
+      return;
+    }
+
+    findById(deliveries, id)?.set(field, value);
+  }, []);
+}
+
+export function useDeleteDelivery() {
+  return useMutation(({ storage }, id: string) => {
+    const deliveries = storage.get('deliveries');
+    const index = deliveries?.findIndex((delivery) => delivery.get('id') === id) ?? -1;
+
+    if (deliveries && index >= 0) {
+      deliveries.delete(index);
+    }
+  }, []);
 }
 
 /** Records the arrival, once, so the activity feed opens with a hello. */

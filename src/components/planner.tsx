@@ -10,13 +10,14 @@ import { BoardView } from '@/components/board-view';
 import { CostsCard } from '@/components/costs-card';
 import { CountdownCard } from '@/components/countdown-card';
 import { Cursors } from '@/components/cursors';
+import { DeliveriesCard } from '@/components/deliveries-card';
 import { ListView } from '@/components/list-view';
 import { QuestionsCard } from '@/components/questions-card';
 import { TimelineView } from '@/components/timeline-view';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAnnounceArrival, useTasks } from '@/hooks/use-plan';
+import { useAnnounceArrival, useDeliveries, useEnsureDeliveries, useTasks } from '@/hooks/use-plan';
 import { daysUntil } from '@/lib/format';
 import { MOMENTS } from '@/lib/plan-config';
 import type { CurrentUser } from '@/lib/types';
@@ -46,8 +47,10 @@ type PlannerProps = {
 
 export function Planner({ user, announce, onLogout }: PlannerProps) {
   const tasks = useTasks();
+  const deliveries = useDeliveries();
   const status = useStatus();
   const announceArrival = useAnnounceArrival();
+  const ensureDeliveries = useEnsureDeliveries();
   const containerRef = useRef<HTMLDivElement>(null);
   const announced = useRef(false);
   const [view, setView] = useState('lijst');
@@ -58,6 +61,13 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
       announceArrival();
     }
   }, [announce, announceArrival]);
+
+  // Rooms created before deliveries existed have no such key; add it once.
+  useEffect(() => {
+    if (deliveries === null) {
+      ensureDeliveries();
+    }
+  }, [deliveries, ensureDeliveries]);
 
   const done = tasks.filter((task) => task.done).length;
   const totalPct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
@@ -157,12 +167,15 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
           <main className="min-w-[340px] flex-[2.4]">
             {view === 'lijst' ? <ListView tasks={tasks} /> : null}
             {view === 'bord' ? <BoardView tasks={tasks} /> : null}
-            {view === 'tijdlijn' ? <TimelineView tasks={tasks} /> : null}
+            {view === 'tijdlijn' ? (
+              <TimelineView tasks={tasks} deliveries={deliveries ?? []} />
+            ) : null}
           </main>
 
           <aside className="flex min-w-[290px] flex-1 flex-col gap-4.5">
             <CountdownCard />
             <QuestionsCard />
+            <DeliveriesCard />
             <CostsCard />
             <ActivityCard />
           </aside>

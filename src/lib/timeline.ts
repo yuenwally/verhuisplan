@@ -1,7 +1,7 @@
 import { isOverdue, startOfToday } from '@/lib/format';
 import { PHASES } from '@/lib/plan-config';
 import type { PhaseDef } from '@/lib/plan-config';
-import type { Task } from '@/lib/types';
+import type { Delivery, Task } from '@/lib/types';
 
 /**
  * Status is encoded by shape as well as colour. Red-green colourblind readers
@@ -24,12 +24,58 @@ export type TimelineRow = {
   items: TimelineItem[];
 };
 
+export type DeliveryBar = {
+  delivery: Delivery;
+  start: Date;
+  end: Date;
+};
+
 export type Timeline = {
   rows: TimelineRow[];
+  /** Deliveries packed into lanes; overlapping windows land on separate lanes. */
+  deliveryLanes: DeliveryBar[][];
   domain: [Date, Date];
   datedCount: number;
   undatedCount: number;
 };
+
+/**
+ * Greedy interval packing: each delivery takes the first lane whose last bar has
+ * already finished. Windows that merely touch (one ends the day another starts)
+ * still count as overlapping, because their bars would abut and read as one.
+ */
+export function packDeliveries(deliveries: readonly Delivery[]): DeliveryBar[][] {
+  const scheduled = deliveries
+    .filter((delivery) => delivery.start && delivery.end)
+    .map((delivery) => ({
+      delivery,
+      start: parseDate(delivery.start),
+      end: parseDate(delivery.end),
+    }))
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  const lanes: DeliveryBar[][] = [];
+
+  for (const bar of scheduled) {
+    const lane = lanes.find((candidate) => {
+      const last = candidate[candidate.length - 1];
+
+      return last !== undefined && last.end.getTime() < bar.start.getTime();
+    });
+
+    if (lane) {
+      lane.push(bar);
+    } else {
+      lanes.push([bar]);
+    }
+  }
+
+  return lanes;
+}
+
+function parseDate(value: string): Date {
+  return new Date(`${value}T00:00`);
+}
 
 export function statusOf(task: Task, today: Date): TimelineStatus {
   if (task.done) {
@@ -37,10 +83,6 @@ export function statusOf(task: Task, today: Date): TimelineStatus {
   }
 
   return isOverdue(task.deadline, task.done, today) ? 'overdue' : 'open';
-}
-
-function parseDate(value: string): Date {
-  return new Date(`${value}T00:00`);
 }
 
 function addDays(date: Date, days: number): Date {
@@ -95,6 +137,7 @@ export function dodgeOverlaps(
 export function buildTimeline(
   tasks: readonly Task[],
   momentDates: readonly string[],
+  deliveries: readonly Delivery[] = [],
   today: Date = startOfToday(),
 ): Timeline {
   const dated = tasks.filter((task) => task.deadline);
@@ -118,9 +161,12 @@ export function buildTimeline(
     }
   }
 
+  const deliveryLanes = packDeliveries(deliveries);
+
   const stamps = [
     ...dated.map((task) => parseDate(task.deadline).getTime()),
     ...momentDates.map((date) => parseDate(date).getTime()),
+    ...deliveryLanes.flat().flatMap((bar) => [bar.start.getTime(), bar.end.getTime()]),
     today.getTime(),
   ];
 
@@ -131,6 +177,7 @@ export function buildTimeline(
 
   return {
     rows,
+    deliveryLanes,
     domain: [addDays(new Date(min), -4), addDays(new Date(max), 4)],
     datedCount: dated.length,
     undatedCount,

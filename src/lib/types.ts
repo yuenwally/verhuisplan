@@ -21,6 +21,19 @@ export type Question = {
   done: boolean;
 };
 
+/**
+ * A delivery or job that occupies a window rather than a day: a bed arriving,
+ * tiles being laid. Empty dates mean "not scheduled yet"; such a delivery is
+ * listed in the card but cannot be drawn on the timeline.
+ */
+export type Delivery = {
+  id: string;
+  label: string;
+  /** Empty string, or an ISO `YYYY-MM-DD` date. */
+  start: string;
+  end: string;
+};
+
 export type Cost = {
   id: string;
   label: string;

@@ -109,6 +109,22 @@ export const TIMELINE_STATUS = {
   open: '#6E5C42',
 } as const;
 
+/**
+ * Deliveries are one series, so they need one hue rather than a palette. This
+ * blue passes the lightness band, the chroma floor, contrast against paper, and
+ * CVD separation from both mark colours above.
+ */
+export const TIMELINE_DELIVERY = '#2A6FA8';
+
+/** The windows Wally gave; editable in the Leveringen card once the room exists. */
+export const SEED_DELIVERIES: readonly { label: string; start: string; end: string }[] = [
+  { label: 'Renovlies', start: '2026-07-20', end: '2026-07-30' },
+  { label: 'X2O', start: '2026-07-27', end: '2026-08-01' },
+  { label: 'Tegels / Vloer', start: '2026-08-17', end: '2026-08-24' },
+  { label: 'Auping bed', start: '2026-08-24', end: '2026-08-30' },
+  { label: 'Kitchen', start: '2026-08-24', end: '2026-08-30' },
+] as const;
+
 export const ROOM_ID = 'verhuisplan';
 
 export const ACTIVITY_LIMIT = 25;

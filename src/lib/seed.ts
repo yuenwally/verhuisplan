@@ -1,6 +1,14 @@
 import { LiveList, LiveObject } from '@liveblocks/client';
-import { SEEDED_USERS } from '@/lib/plan-config';
-import type { ActivityEntry, Cost, KnownUser, PhaseId, Question, Task } from '@/lib/types';
+import { SEED_DELIVERIES, SEEDED_USERS } from '@/lib/plan-config';
+import type {
+  ActivityEntry,
+  Cost,
+  Delivery,
+  KnownUser,
+  PhaseId,
+  Question,
+  Task,
+} from '@/lib/types';
 
 type SeedTask = [phase: PhaseId, title: string, who: string[]];
 
@@ -80,5 +88,16 @@ export function initialStorage() {
     ),
     activity: new LiveList<LiveObject<ActivityEntry>>([]),
     users: new LiveList(SEEDED_USERS.map((user) => new LiveObject<KnownUser>({ ...user }))),
+    deliveries: seedDeliveries(),
   };
+}
+
+/** Also used by the migration, for rooms created before deliveries existed. */
+export function seedDeliveries() {
+  return new LiveList(
+    SEED_DELIVERIES.map((delivery, index) => new LiveObject<Delivery>({
+      id: `d${index + 1}`,
+      ...delivery,
+    })),
+  );
 }
