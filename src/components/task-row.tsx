@@ -81,7 +81,9 @@ export function TaskRow({
         transition={{ type: 'spring', stiffness: 500, damping: 40 }}
         onClick={() => swiped && setSwiped(false)}
         style={{ background }}
-        className="relative flex flex-col gap-1.5 px-1.5 py-2 transition-colors duration-300
+        // `group` is what the comment icon hovers against; without it the icon
+        // never appears on a task that has no comments yet.
+        className="group relative flex flex-col gap-1.5 px-1.5 py-2 transition-colors duration-300
           sm:flex-row sm:items-center sm:gap-2.5"
       >
         <div className="flex w-full items-center gap-2.5 sm:w-auto sm:flex-1">
