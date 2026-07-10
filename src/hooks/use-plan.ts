@@ -176,6 +176,18 @@ export function useAddDelivery() {
   }, []);
 }
 
+export function useSetDeliveryLabel() {
+  return useMutation(({ storage }, id: string, label: string) => {
+    const deliveries = storage.get('deliveries');
+
+    if (!deliveries) {
+      return;
+    }
+
+    findById(deliveries, id)?.set('label', label);
+  }, []);
+}
+
 export function useSetDeliveryDate() {
   return useMutation(({ storage }, id: string, field: 'start' | 'end', value: string) => {
     const deliveries = storage.get('deliveries');

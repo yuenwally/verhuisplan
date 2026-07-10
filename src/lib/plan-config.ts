@@ -120,8 +120,8 @@ export const TIMELINE_DELIVERY = '#2A6FA8';
 export const SEED_DELIVERIES: readonly { label: string; start: string; end: string }[] = [
   { label: 'Renovlies', start: '2026-07-20', end: '2026-07-30' },
   { label: 'X2O', start: '2026-07-27', end: '2026-08-01' },
-  { label: 'Tegels / Vloer', start: '2026-08-17', end: '2026-08-24' },
-  { label: 'Auping bed', start: '2026-08-24', end: '2026-08-30' },
+  { label: 'Floor', start: '2026-08-17', end: '2026-08-24' },
+  { label: 'Bed', start: '2026-08-24', end: '2026-08-30' },
   { label: 'Kitchen', start: '2026-08-24', end: '2026-08-30' },
 ] as const;
 

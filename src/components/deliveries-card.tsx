@@ -4,8 +4,13 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useId } from 'react';
 import { AddInput } from '@/components/add-input';
 import { useFlash } from '@/components/flash-provider';
-import { Label } from '@/components/ui/label';
-import { useAddDelivery, useDeleteDelivery, useDeliveries, useSetDeliveryDate } from '@/hooks/use-plan';
+import {
+  useAddDelivery,
+  useDeleteDelivery,
+  useDeliveries,
+  useSetDeliveryDate,
+  useSetDeliveryLabel,
+} from '@/hooks/use-plan';
 import { tint } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
@@ -17,6 +22,7 @@ const ROW_INSET = 'px-1.5';
 
 function DeliveryRow({ delivery }: { delivery: Delivery }) {
   const setDate = useSetDeliveryDate();
+  const setLabel = useSetDeliveryLabel();
   const deleteDelivery = useDeleteDelivery();
   const { flashes, flash } = useFlash();
   const startId = useId();
@@ -39,9 +45,18 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
       )}
     >
       <div className="flex items-center gap-2">
-        <Label htmlFor={startId} className="min-w-0 flex-1 cursor-pointer text-[13.5px] font-bold">
-          {delivery.label}
-        </Label>
+        {/* Editable in place: a delivery's name is as likely to be wrong as its date. */}
+        <input
+          value={delivery.label}
+          aria-label={`Naam van ${delivery.label}`}
+          onChange={(event) => {
+            setLabel(delivery.id, event.target.value);
+            flash(delivery.id);
+          }}
+          className="min-w-0 flex-1 rounded-[4px] border-[1.5px] border-transparent bg-transparent
+            px-1 py-0.5 text-[13.5px] font-bold text-foreground outline-none
+            hover:border-input focus:border-primary/60"
+        />
         <button
           type="button"
           aria-label={`${delivery.label} verwijderen`}
