@@ -41,6 +41,19 @@ export type Cost = {
   amount: string;
 };
 
+/**
+ * Kept in a flat list keyed by `taskId` rather than nested inside the task, so
+ * the 22 tasks already in storage need no migration of their own shape.
+ */
+export type Comment = {
+  id: string;
+  taskId: string;
+  author: string;
+  avatar: string;
+  text: string;
+  ts: number;
+};
+
 export type ActivityEntry = {
   id: string;
   user: string;

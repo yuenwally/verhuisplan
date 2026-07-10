@@ -5,7 +5,7 @@ import { AddInput } from '@/components/add-input';
 import { TaskRow } from '@/components/task-row';
 import { TypingGhost } from '@/components/typing-ghost';
 import { Progress } from '@/components/ui/progress';
-import { useAddTask } from '@/hooks/use-plan';
+import { useAddTask, useCommentCounts } from '@/hooks/use-plan';
 import type { DragHandlers } from '@/hooks/use-drag-reorder';
 import type { PhaseDef } from '@/lib/plan-config';
 import type { Task } from '@/lib/types';
@@ -18,6 +18,7 @@ type PhaseCardProps = {
 
 export function PhaseCard({ phase, tasks, drag }: PhaseCardProps) {
   const addTask = useAddTask();
+  const commentCounts = useCommentCounts();
   const done = tasks.filter((task) => task.done).length;
   const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
 
@@ -51,7 +52,12 @@ export function PhaseCard({ phase, tasks, drag }: PhaseCardProps) {
       <div className="flex flex-col">
         <AnimatePresence initial={false}>
           {tasks.map((task) => (
-            <TaskRow key={task.id} task={task} drag={drag} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              drag={drag}
+              commentCount={commentCounts[task.id] ?? 0}
+            />
           ))}
         </AnimatePresence>
       </div>

@@ -5,12 +5,13 @@ import { AddInput } from '@/components/add-input';
 import { TaskCard } from '@/components/task-card';
 import { TypingGhost } from '@/components/typing-ghost';
 import { useDragReorder } from '@/hooks/use-drag-reorder';
-import { useAddTask } from '@/hooks/use-plan';
+import { useAddTask, useCommentCounts } from '@/hooks/use-plan';
 import { PHASES } from '@/lib/plan-config';
 import type { Task } from '@/lib/types';
 
 export function BoardView({ tasks }: { tasks: readonly Task[] }) {
   const addTask = useAddTask();
+  const commentCounts = useCommentCounts();
   const drag = useDragReorder();
 
   return (
@@ -34,7 +35,12 @@ export function BoardView({ tasks }: { tasks: readonly Task[] }) {
             <motion.div layout className="flex flex-col gap-2">
               <AnimatePresence initial={false}>
                 {phaseTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} drag={drag} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    drag={drag}
+                    commentCount={commentCounts[task.id] ?? 0}
+                  />
                 ))}
               </AnimatePresence>
             </motion.div>

@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { useId } from 'react';
 import { AssigneeMenu } from '@/components/assignee-menu';
 import { useFlash } from '@/components/flash-provider';
+import { TaskComments } from '@/components/task-comments';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useTaskActions } from '@/hooks/use-task-actions';
@@ -16,7 +17,15 @@ import type { Task } from '@/lib/types';
 const CARD_PADDING_Y = 10;
 
 /** The board view's compact card. Same data, fewer controls than the list row. */
-export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
+export function TaskCard({
+  task,
+  drag,
+  commentCount,
+}: {
+  task: Task;
+  drag: DragHandlers;
+  commentCount: number;
+}) {
   const { onToggle, onToggleAssignee } = useTaskActions(task.id);
   const { flashes } = useFlash();
   const checkboxId = useId();
@@ -34,7 +43,7 @@ export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
       onDragOver={(event) => event.preventDefault()}
       onDragEnd={drag.onDragEnd}
       style={flashColor ? { background: tint(flashColor) } : undefined}
-      className="overflow-hidden rounded-[10px] border-[1.5px] border-border bg-card px-2.5
+      className="group overflow-hidden rounded-[10px] border-[1.5px] border-border bg-card px-2.5
         shadow-[0_2px_6px_rgba(90,70,40,0.06)] transition-colors duration-300"
     >
       {/* Completed cards dim through a class, so the enter fade above stays free
@@ -74,6 +83,8 @@ export function TaskCard({ task, drag }: { task: Task; drag: DragHandlers }) {
           >
             {formatDeadlineShort(task.deadline)}
           </span>
+          <div className="flex-1" />
+          <TaskComments taskId={task.id} count={commentCount} />
         </div>
       </div>
     </motion.div>

@@ -1,4 +1,12 @@
-import type { ActivityEntry, Cost, Delivery, KnownUser, Question, Task } from '@/lib/types';
+import type {
+  ActivityEntry,
+  Comment,
+  Cost,
+  Delivery,
+  KnownUser,
+  Question,
+  Task,
+} from '@/lib/types';
 import type { LiveList, LiveObject } from '@liveblocks/client';
 
 declare global {
@@ -17,11 +25,12 @@ declare global {
       activity: LiveList<LiveObject<ActivityEntry>>;
       users: LiveList<LiveObject<KnownUser>>;
       /**
-       * Added after the room existed, so it is absent from older storage. Read it
-       * through `useDeliveries`, which tolerates `undefined` until the migration
-       * in `useEnsureDeliveries` has run.
+       * Added after the room existed, so they are absent from older storage. Read
+       * them through hooks that tolerate `undefined` until `useEnsureStorage` has
+       * created them.
        */
       deliveries: LiveList<LiveObject<Delivery>>;
+      comments: LiveList<LiveObject<Comment>>;
     };
 
     UserMeta: {

@@ -17,7 +17,13 @@ import { TimelineView } from '@/components/timeline-view';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAnnounceArrival, useDeliveries, useEnsureDeliveries, useTasks } from '@/hooks/use-plan';
+import {
+  useAnnounceArrival,
+  useDeliveries,
+  useEnsureStorage,
+  useNeedsMigration,
+  useTasks,
+} from '@/hooks/use-plan';
 import { daysUntil } from '@/lib/format';
 import { MOMENTS } from '@/lib/plan-config';
 import type { CurrentUser } from '@/lib/types';
@@ -50,7 +56,8 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
   const deliveries = useDeliveries();
   const status = useStatus();
   const announceArrival = useAnnounceArrival();
-  const ensureDeliveries = useEnsureDeliveries();
+  const ensureStorage = useEnsureStorage();
+  const needsMigration = useNeedsMigration();
   const containerRef = useRef<HTMLDivElement>(null);
   const announced = useRef(false);
   const [view, setView] = useState('lijst');
@@ -62,12 +69,12 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
     }
   }, [announce, announceArrival]);
 
-  // Rooms created before deliveries existed have no such key; add it once.
+  // Rooms created before deliveries and comments existed lack those keys; add once.
   useEffect(() => {
-    if (deliveries === null) {
-      ensureDeliveries();
+    if (needsMigration) {
+      ensureStorage();
     }
-  }, [deliveries, ensureDeliveries]);
+  }, [needsMigration, ensureStorage]);
 
   const done = tasks.filter((task) => task.done).length;
   const totalPct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;

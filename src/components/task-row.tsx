@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { useId } from 'react';
 import { AssigneeMenu } from '@/components/assignee-menu';
 import { useFlash } from '@/components/flash-provider';
+import { TaskComments } from '@/components/task-comments';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useDeleteTask, useSetDeadline } from '@/hooks/use-plan';
@@ -23,7 +24,15 @@ const ROW_PADDING_Y = 8;
 /** The assignee pill and the deadline field share this, so they line up. */
 const CONTROL_HEIGHT = 'h-6';
 
-export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
+export function TaskRow({
+  task,
+  drag,
+  commentCount,
+}: {
+  task: Task;
+  drag: DragHandlers;
+  commentCount: number;
+}) {
   const { onToggle, onToggleAssignee } = useTaskActions(task.id);
   const setDeadline = useSetDeadline();
   const deleteTask = useDeleteTask();
@@ -46,8 +55,8 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
       onDragOver={(event) => event.preventDefault()}
       onDragEnd={drag.onDragEnd}
       style={{ background }}
-      className="flex items-center gap-2.5 overflow-hidden border-t border-dashed border-border
-        px-1.5 transition-colors duration-300"
+      className="group flex items-center gap-2.5 overflow-hidden border-t border-dashed
+        border-border px-1.5 transition-colors duration-300"
     >
       <span aria-hidden className="cursor-grab text-[15px] text-[#C9B48C] select-none">
         ⠿
@@ -79,6 +88,8 @@ export function TaskRow({ task, drag }: { task: Task; drag: DragHandlers }) {
           />
         </span>
       </Label>
+
+      <TaskComments taskId={task.id} count={commentCount} />
 
       <AssigneeMenu who={task.who} onToggle={onToggleAssignee} className={CONTROL_HEIGHT} />
 

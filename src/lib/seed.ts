@@ -2,6 +2,7 @@ import { LiveList, LiveObject } from '@liveblocks/client';
 import { SEED_DELIVERIES, SEEDED_USERS } from '@/lib/plan-config';
 import type {
   ActivityEntry,
+  Comment,
   Cost,
   Delivery,
   KnownUser,
@@ -89,6 +90,7 @@ export function initialStorage() {
     activity: new LiveList<LiveObject<ActivityEntry>>([]),
     users: new LiveList(SEEDED_USERS.map((user) => new LiveObject<KnownUser>({ ...user }))),
     deliveries: seedDeliveries(),
+    comments: new LiveList<LiveObject<Comment>>([]),
   };
 }
 

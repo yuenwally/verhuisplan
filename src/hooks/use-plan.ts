@@ -1,14 +1,22 @@
 'use client';
 
-import { LiveObject, nanoid } from '@liveblocks/client';
-import { useMutation, useStorage } from '@liveblocks/react/suspense';
+import { LiveList, LiveObject, nanoid } from '@liveblocks/client';
+import { shallow, useMutation, useStorage } from '@liveblocks/react/suspense';
 import { normalizeWho, toggleAssignee } from '@/lib/assignees';
 import { truncate } from '@/lib/format';
 import { ACTIVITY_LIMIT, SEEDED_USERS } from '@/lib/plan-config';
 import { moveWithinPhase } from '@/lib/reorder';
 import { seedDeliveries } from '@/lib/seed';
-import type { ActivityEntry, Cost, Delivery, PhaseId, Question, Task } from '@/lib/types';
-import type { LiveList, LiveObject as LiveObjectType, User } from '@liveblocks/client';
+import type {
+  ActivityEntry,
+  Comment,
+  Cost,
+  Delivery,
+  PhaseId,
+  Question,
+  Task,
+} from '@/lib/types';
+import type { LiveObject as LiveObjectType, User } from '@liveblocks/client';
 
 type Self = User<Liveblocks['Presence'], Liveblocks['UserMeta']>;
 type Root = LiveObjectType<Liveblocks['Storage']>;
@@ -61,7 +69,7 @@ export function useKnownUsers() {
 }
 
 /**
- * Undefined in rooms created before deliveries existed, until `useEnsureDeliveries`
+ * Undefined in rooms created before deliveries existed, until `useEnsureStorage`
  * has run. Callers must treat that as "not loaded yet", not as "none".
  */
 export function useDeliveries() {
@@ -69,14 +77,87 @@ export function useDeliveries() {
 }
 
 /**
- * Adds the `deliveries` list to a room that predates it. `initialStorage` only
- * applies to a room with no storage at all, so an existing room would otherwise
- * never gain the key and every read would come back undefined.
+ * Comments for one task, oldest first. Undefined in rooms that predate the key.
  */
-export function useEnsureDeliveries() {
+export function useTaskComments(taskId: string) {
+  return useStorage(
+    (root) => (root.comments ?? []).filter((comment) => comment.taskId === taskId),
+    shallow,
+  );
+}
+
+/** How many comments each task carries, so a row can show its icon. */
+export function useCommentCounts() {
+  return useStorage((root) => {
+    const counts: Record<string, number> = {};
+
+    for (const comment of root.comments ?? []) {
+      counts[comment.taskId] = (counts[comment.taskId] ?? 0) + 1;
+    }
+
+    return counts;
+  }, shallow);
+}
+
+/**
+ * True while any late-added key is still missing.
+ *
+ * Each key must be checked in its own right. Gating the migration on `deliveries`
+ * alone would skip `comments` in a room that had already been given deliveries.
+ */
+export function useNeedsMigration() {
+  return useStorage((root) => root.deliveries === undefined || root.comments === undefined);
+}
+
+/**
+ * Adds keys that a room created before them does not have. `initialStorage` only
+ * applies to a room with no storage at all, so an existing room would otherwise
+ * never gain them and every read would come back undefined.
+ */
+export function useEnsureStorage() {
   return useMutation(({ storage }) => {
     if (storage.get('deliveries') === undefined) {
       storage.set('deliveries', seedDeliveries());
+    }
+
+    if (storage.get('comments') === undefined) {
+      storage.set('comments', new LiveList<LiveObject<Comment>>([]));
+    }
+  }, []);
+}
+
+export function useAddComment() {
+  return useMutation(({ storage, self }, taskId: string, text: string) => {
+    const trimmed = text.trim();
+    const comments = storage.get('comments');
+
+    if (!trimmed || !comments) {
+      return;
+    }
+
+    comments.push(
+      new LiveObject<Comment>({
+        id: nanoid(),
+        taskId,
+        author: self.info.name,
+        avatar: self.info.avatar,
+        text: trimmed,
+        ts: Date.now(),
+      }),
+    );
+
+    const task = findById(storage.get('tasks'), taskId);
+    pushActivity(storage, self, `reageerde op: “${truncate(task?.get('title') ?? '', 40)}”`);
+  }, []);
+}
+
+export function useDeleteComment() {
+  return useMutation(({ storage }, id: string) => {
+    const comments = storage.get('comments');
+    const index = comments?.findIndex((comment) => comment.get('id') === id) ?? -1;
+
+    if (comments && index >= 0) {
+      comments.delete(index);
     }
   }, []);
 }
@@ -231,6 +312,18 @@ export function useDeleteTask() {
 
     const title = tasks.get(index)?.get('title') ?? '';
     tasks.delete(index);
+
+    // Comments live in a flat list, so they do not go with the task on their own.
+    const comments = storage.get('comments');
+
+    if (comments) {
+      for (let i = comments.length - 1; i >= 0; i--) {
+        if (comments.get(i)?.get('taskId') === id) {
+          comments.delete(i);
+        }
+      }
+    }
+
     pushActivity(storage, self, `verwijderde: “${truncate(title, 40)}”`);
   }, []);
 }
