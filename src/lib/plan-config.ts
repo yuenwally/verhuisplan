@@ -92,6 +92,23 @@ export const CONFETTI_COLORS = [
 
 export const AVATAR_POOL = ['🦊', '🐸', '🐙', '🦉', '🐝', '🐢', '🦔', '🐨'] as const;
 
+/**
+ * Timeline mark colours, chosen by the palette validator rather than by eye and
+ * deliberately not the UI's `--success` / `--destructive`.
+ *
+ * The interface green (#6FA26B) scores 2.9:1 against the paper surface, below the
+ * 3:1 floor for a mark, and the interface terracotta and red sit ΔE 11.4 apart
+ * under deuteranopia, which is close enough that an overdue task and an open one
+ * would look the same. These two pass the lightness band, the chroma floor, CVD
+ * separation (ΔE 13.4 deutan) and contrast. `open` is neutral on purpose: it is
+ * a hollow ring, making no colour claim at all.
+ */
+export const TIMELINE_STATUS = {
+  done: '#2F9147',
+  overdue: '#B3382C',
+  open: '#6E5C42',
+} as const;
+
 export const ROOM_ID = 'verhuisplan';
 
 export const ACTIVITY_LIMIT = 25;

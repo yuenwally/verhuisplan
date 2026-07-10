@@ -12,6 +12,7 @@ import { CountdownCard } from '@/components/countdown-card';
 import { Cursors } from '@/components/cursors';
 import { ListView } from '@/components/list-view';
 import { QuestionsCard } from '@/components/questions-card';
+import { TimelineView } from '@/components/timeline-view';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -129,6 +130,13 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
               >
                 ▦ Bord
               </TabsTrigger>
+              <TabsTrigger
+                value="tijdlijn"
+                className="cursor-pointer rounded-[9px] px-4.5 py-2 text-sm font-extrabold
+                  data-[state=active]:bg-foreground data-[state=active]:text-background"
+              >
+                ▤ Tijdlijn
+              </TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -147,7 +155,9 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
 
         <div className="flex flex-wrap items-start gap-5.5">
           <main className="min-w-[340px] flex-[2.4]">
-            {view === 'lijst' ? <ListView tasks={tasks} /> : <BoardView tasks={tasks} />}
+            {view === 'lijst' ? <ListView tasks={tasks} /> : null}
+            {view === 'bord' ? <BoardView tasks={tasks} /> : null}
+            {view === 'tijdlijn' ? <TimelineView tasks={tasks} /> : null}
           </main>
 
           <aside className="flex min-w-[290px] flex-1 flex-col gap-4.5">
