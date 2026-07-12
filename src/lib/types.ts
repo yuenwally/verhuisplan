@@ -41,13 +41,18 @@ export type Cost = {
   amount: string;
 };
 
+export type CommentSubjectKind = 'task' | 'delivery';
+
 /**
- * Kept in a flat list keyed by `taskId` rather than nested inside the task, so
- * the 22 tasks already in storage need no migration of their own shape.
+ * A comment on a subject — a task or a delivery. Kept in a flat list keyed by
+ * `subjectId` rather than nested inside the subject, so no per-item shape lives
+ * on the 22 tasks (or the deliveries) already in storage. `subjectKind` lets the
+ * activity feed name the right thing when one is added.
  */
 export type Comment = {
   id: string;
-  taskId: string;
+  subjectId: string;
+  subjectKind: CommentSubjectKind;
   author: string;
   avatar: string;
   text: string;

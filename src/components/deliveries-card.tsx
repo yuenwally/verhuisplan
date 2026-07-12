@@ -3,9 +3,11 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useId } from 'react';
 import { AddInput } from '@/components/add-input';
+import { Comments } from '@/components/comments';
 import { useFlash } from '@/components/flash-provider';
 import {
   useAddDelivery,
+  useCommentCounts,
   useDeleteDelivery,
   useDeliveries,
   useSetDeliveryDate,
@@ -26,6 +28,8 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
   const deleteDelivery = useDeleteDelivery();
   const { flashes, flash } = useFlash();
   const startId = useId();
+  const commentCounts = useCommentCounts();
+  const commentCount = commentCounts[delivery.id] ?? 0;
 
   const flashColor = flashes[delivery.id];
   const incomplete = !delivery.start || !delivery.end;
@@ -57,6 +61,7 @@ function DeliveryRow({ delivery }: { delivery: Delivery }) {
             px-1 py-0.5 text-[13.5px] font-bold text-foreground outline-none
             hover:border-input focus:border-primary/60"
         />
+        <Comments subjectId={delivery.id} subjectKind="delivery" count={commentCount} />
         <button
           type="button"
           aria-label={`${delivery.label} verwijderen`}

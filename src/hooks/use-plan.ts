@@ -10,6 +10,7 @@ import { seedDeliveries } from '@/lib/seed';
 import type {
   ActivityEntry,
   Comment,
+  CommentSubjectKind,
   Cost,
   Delivery,
   PhaseId,
@@ -77,22 +78,23 @@ export function useDeliveries() {
 }
 
 /**
- * Comments for one task, oldest first. Undefined in rooms that predate the key.
+ * Comments for one subject (a task or a delivery), oldest first. Undefined in
+ * rooms that predate the key, so the fallback empty array stands in until then.
  */
-export function useTaskComments(taskId: string) {
+export function useSubjectComments(subjectId: string) {
   return useStorage(
-    (root) => (root.comments ?? []).filter((comment) => comment.taskId === taskId),
+    (root) => (root.comments ?? []).filter((comment) => comment.subjectId === subjectId),
     shallow,
   );
 }
 
-/** How many comments each task carries, so a row can show its icon. */
+/** How many comments each subject carries, so a row can show its icon. */
 export function useCommentCounts() {
   return useStorage((root) => {
     const counts: Record<string, number> = {};
 
     for (const comment of root.comments ?? []) {
-      counts[comment.taskId] = (counts[comment.taskId] ?? 0) + 1;
+      counts[comment.subjectId] = (counts[comment.subjectId] ?? 0) + 1;
     }
 
     return counts;
@@ -106,7 +108,16 @@ export function useCommentCounts() {
  * alone would skip `comments` in a room that had already been given deliveries.
  */
 export function useNeedsMigration() {
-  return useStorage((root) => root.deliveries === undefined || root.comments === undefined);
+  return useStorage(
+    (root) =>
+      root.deliveries === undefined
+      || root.comments === undefined
+      // The stored shape may predate `subjectKind`; the type says it is always
+      // present, so read it through a loose cast to ask whether it really is.
+      || (root.comments ?? []).some(
+        (comment) => (comment as { subjectKind?: string }).subjectKind === undefined,
+      ),
+  );
 }
 
 /**
@@ -120,35 +131,69 @@ export function useEnsureStorage() {
       storage.set('deliveries', seedDeliveries());
     }
 
-    if (storage.get('comments') === undefined) {
+    const comments = storage.get('comments');
+
+    if (comments === undefined) {
       storage.set('comments', new LiveList<LiveObject<Comment>>([]));
+      return;
+    }
+
+    // Older comments were keyed by `taskId` with no `subjectKind`. Rewrite them
+    // in place to the subject shape; a comment that already has `subjectKind` is
+    // left untouched, so this is safe to run more than once. The stored object
+    // predates the current type, so reach it through a loose view of the keys.
+    for (const comment of comments) {
+      const legacy = comment as unknown as {
+        get: (key: string) => string | undefined;
+        set: (key: string, value: string) => void;
+        delete: (key: string) => void;
+      };
+
+      if (legacy.get('subjectKind') !== undefined) {
+        continue;
+      }
+
+      legacy.set('subjectId', legacy.get('subjectId') ?? legacy.get('taskId') ?? '');
+      legacy.set('subjectKind', 'task');
+      legacy.delete('taskId');
     }
   }, []);
 }
 
 export function useAddComment() {
-  return useMutation(({ storage, self }, taskId: string, text: string) => {
-    const trimmed = text.trim();
-    const comments = storage.get('comments');
+  return useMutation(
+    ({ storage, self }, subjectId: string, subjectKind: CommentSubjectKind, text: string) => {
+      const trimmed = text.trim();
+      const comments = storage.get('comments');
 
-    if (!trimmed || !comments) {
-      return;
-    }
+      if (!trimmed || !comments) {
+        return;
+      }
 
-    comments.push(
-      new LiveObject<Comment>({
-        id: nanoid(),
-        taskId,
-        author: self.info.name,
-        avatar: self.info.avatar,
-        text: trimmed,
-        ts: Date.now(),
-      }),
-    );
+      comments.push(
+        new LiveObject<Comment>({
+          id: nanoid(),
+          subjectId,
+          subjectKind,
+          author: self.info.name,
+          avatar: self.info.avatar,
+          text: trimmed,
+          ts: Date.now(),
+        }),
+      );
 
-    const task = findById(storage.get('tasks'), taskId);
-    pushActivity(storage, self, `reageerde op: “${truncate(task?.get('title') ?? '', 40)}”`);
-  }, []);
+      const deliveries = storage.get('deliveries');
+      const label =
+        subjectKind === 'task'
+          ? findById(storage.get('tasks'), subjectId)?.get('title')
+          : deliveries
+            ? findById(deliveries, subjectId)?.get('label')
+            : undefined;
+
+      pushActivity(storage, self, `reageerde op: “${truncate(label ?? '', 40)}”`);
+    },
+    [],
+  );
 }
 
 export function useDeleteComment() {
@@ -207,6 +252,17 @@ export function useDeleteDelivery() {
 
     if (deliveries && index >= 0) {
       deliveries.delete(index);
+    }
+
+    // Comments live in a flat list, so they do not go with the delivery on their own.
+    const comments = storage.get('comments');
+
+    if (comments) {
+      for (let i = comments.length - 1; i >= 0; i--) {
+        if (comments.get(i)?.get('subjectId') === id) {
+          comments.delete(i);
+        }
+      }
     }
   }, []);
 }
@@ -330,7 +386,7 @@ export function useDeleteTask() {
 
     if (comments) {
       for (let i = comments.length - 1; i >= 0; i--) {
-        if (comments.get(i)?.get('taskId') === id) {
+        if (comments.get(i)?.get('subjectId') === id) {
           comments.delete(i);
         }
       }

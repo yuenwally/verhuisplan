@@ -3,8 +3,8 @@
 import { motion } from 'motion/react';
 import { useId, useState } from 'react';
 import { AssigneeMenu } from '@/components/assignee-menu';
+import { Comments } from '@/components/comments';
 import { useFlash } from '@/components/flash-provider';
-import { TaskComments } from '@/components/task-comments';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useIsTouch } from '@/hooks/use-is-touch';
@@ -127,7 +127,7 @@ export function TaskRow({
         {/* `sm:contents` dissolves this wrapper on desktop, so the single-line
             layout stays exactly what it was before mobile existed. */}
         <div className="flex w-full items-center gap-2 pl-[26px] sm:contents sm:w-auto sm:pl-0">
-          <TaskComments taskId={task.id} count={commentCount} />
+          <Comments subjectId={task.id} subjectKind="task" count={commentCount} />
 
           <AssigneeMenu who={task.who} onToggle={onToggleAssignee} className={CONTROL_HEIGHT} />
 
