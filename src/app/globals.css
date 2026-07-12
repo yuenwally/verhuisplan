@@ -107,6 +107,15 @@
   }
 }
 
+/* A horizontal scroller whose scrollbar is kept out of the layout. */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* The faint diagonal corrugation behind the login card. */
 @utility bg-cardboard {
   background: repeating-linear-gradient(

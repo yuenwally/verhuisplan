@@ -7,6 +7,7 @@ import { ActivityCard } from '@/components/activity-card';
 import { AvatarGlyph } from '@/components/avatar-glyph';
 import { AvatarStack } from '@/components/avatar-stack';
 import { BoardView } from '@/components/board-view';
+import { CalendarView } from '@/components/calendar-view';
 import { CostsCard } from '@/components/costs-card';
 import { CountdownCard } from '@/components/countdown-card';
 import { Cursors } from '@/components/cursors';
@@ -154,6 +155,13 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
               >
                 ▤ Tijdlijn
               </TabsTrigger>
+              <TabsTrigger
+                value="kalender"
+                className="cursor-pointer rounded-[9px] px-4.5 py-2 text-sm font-extrabold
+                  data-[state=active]:bg-foreground data-[state=active]:text-background"
+              >
+                📅 Kalender
+              </TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -177,15 +185,22 @@ export function Planner({ user, announce, onLogout }: PlannerProps) {
             {view === 'tijdlijn' ? (
               <TimelineView tasks={tasks} deliveries={deliveries ?? []} />
             ) : null}
+            {view === 'kalender' ? (
+              <CalendarView tasks={tasks} deliveries={deliveries ?? []} />
+            ) : null}
           </main>
 
-          <aside className="flex min-w-[290px] flex-1 flex-col gap-4.5">
-            <CountdownCard />
-            <QuestionsCard />
-            <DeliveriesCard />
-            <CostsCard />
-            <ActivityCard />
-          </aside>
+          {/* The timeline and calendar read best across the full width, so those
+              tabs drop the sidebar cards entirely. */}
+          {view === 'tijdlijn' || view === 'kalender' ? null : (
+            <aside className="flex min-w-[290px] flex-1 flex-col gap-4.5">
+              <CountdownCard />
+              <QuestionsCard />
+              <DeliveriesCard />
+              <CostsCard />
+              <ActivityCard />
+            </aside>
+          )}
         </div>
       </div>
     </div>
