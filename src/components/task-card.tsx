@@ -3,8 +3,8 @@
 import { motion } from 'motion/react';
 import { useId } from 'react';
 import { AssigneeMenu } from '@/components/assignee-menu';
+import { Comments } from '@/components/comments';
 import { useFlash } from '@/components/flash-provider';
-import { TaskComments } from '@/components/task-comments';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useTaskActions } from '@/hooks/use-task-actions';
@@ -88,7 +88,7 @@ export function TaskCard({
             {formatDeadlineShort(task.deadline)}
           </span>
           <div className="flex-1" />
-          <TaskComments taskId={task.id} count={commentCount} />
+          <Comments subjectId={task.id} subjectKind="task" count={commentCount} />
         </div>
       </div>
     </motion.div>

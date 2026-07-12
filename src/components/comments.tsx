@@ -6,28 +6,31 @@ import { useState } from 'react';
 import { AvatarGlyph } from '@/components/avatar-glyph';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsTouch } from '@/hooks/use-is-touch';
-import { useAddComment, useDeleteComment, useTaskComments } from '@/hooks/use-plan';
+import { useAddComment, useDeleteComment, useSubjectComments } from '@/hooks/use-plan';
 import { timeAgo } from '@/lib/format';
 import { listItemMotion } from '@/lib/motion';
 import { cn } from '@/lib/utils';
+import type { CommentSubjectKind } from '@/lib/types';
 import type { KeyboardEvent } from 'react';
 
 /**
- * The icon is only visible once a task has a comment, as asked. With none it
+ * The icon is only visible once a subject has a comment, as asked. With none it
  * still has to be reachable: a mouse reveals it by hovering the row, and touch,
  * which cannot hover, always sees it. Otherwise a first comment could never be
- * written on a phone.
+ * written on a phone. Works the same for a task or a delivery.
  */
-export function TaskComments({
-  taskId,
+export function Comments({
+  subjectId,
+  subjectKind,
   count,
   className,
 }: {
-  taskId: string;
+  subjectId: string;
+  subjectKind: CommentSubjectKind;
   count: number;
   className?: string;
 }) {
-  const comments = useTaskComments(taskId);
+  const comments = useSubjectComments(subjectId);
   const isTouch = useIsTouch();
   const addComment = useAddComment();
   const deleteComment = useDeleteComment();
@@ -40,7 +43,7 @@ export function TaskComments({
       return;
     }
 
-    addComment(taskId, trimmed);
+    addComment(subjectId, subjectKind, trimmed);
     setDraft('');
   };
 
@@ -87,7 +90,7 @@ export function TaskComments({
 
         {comments.length === 0 ? (
           <p className="mb-2 text-[13px] font-semibold text-ink-faint">
-            Nog geen opmerkingen bij deze taak.
+            Nog geen opmerkingen.
           </p>
         ) : (
           <div className="mb-2 flex max-h-56 flex-col gap-2 overflow-y-auto">
